@@ -1086,7 +1086,7 @@ public class Manejo implements Datos.Iface {
         }
     }
     
-    String Selecionar(String Campos, String Tabla,String Condiciones){
+    String Selecionar(String Campos, String Tabla,String Condiciones,String Orden){
         String Respuesta="";
         
         if(!Condiciones.equals("")){
@@ -1153,7 +1153,10 @@ public class Manejo implements Datos.Iface {
                                 Respuesta += Registros[x] + "#";
                             }
                         }
-                    }                  
+                    }else{
+                    Respuesta=Valores;    
+                    }
+                    
 
                 }else{
                     
@@ -1557,13 +1560,16 @@ public class Manejo implements Datos.Iface {
                    String campos=Ejecuccion((SimpleNode) raiz.children[0]);
                    String tabla_busqueda=((SimpleNode) raiz.children[1]).name;
                    
-                   if (raiz.children.length > 3) {
+                   if(raiz.children.length==5){
+                   
+                       
+                   }else if (raiz.children.length == 4) {
                      String Condiciones=Ejecuccion((SimpleNode) raiz.children[2]);
                      System.out.println("Control");
                      
-                     Respuesta=Selecionar(campos,tabla_busqueda,Condiciones);
+                     Respuesta=Selecionar(campos,tabla_busqueda,Condiciones,"");
                     }else{
-                        Respuesta=Selecionar(campos,tabla_busqueda,"");
+                        Respuesta=Selecionar(campos,tabla_busqueda,"","");
                     }
                 }else{
                     
