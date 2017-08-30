@@ -1757,7 +1757,43 @@ public class Manejo implements Datos.Iface {
             break;
             
             case 53://Asignacion
+                if(Ejecutar){
+                    String varAsig=((SimpleNode) raiz.children[0]).name;
+                    String Valor= Ejecuccion((SimpleNode) raiz.children[1]);
+                    Asignacion(varAsig,Valor);
+                    Respuesta="Exito";
+                }else{
+                    Respuesta=((SimpleNode) raiz.children[0]).name+" ="+Ejecuccion((SimpleNode) raiz.children[1])+";";
+                }
+            break;
+            
+            case 54://if
+                if (Ejecutar) {
+                    String condicionIF = Ejecuccion((SimpleNode) raiz.children[0]);
+
+                    if (condicionIF.equals("true")) {
+                        Respuesta = Ejecuccion((SimpleNode) raiz.children[1]);
+                    }
+                    if (raiz.children.length == 3) {
+                        Respuesta = Ejecuccion((SimpleNode) raiz.children[2]);
+                    }
+                } else {
+                   Respuesta="Si ("+ Ejecuccion((SimpleNode) raiz.children[0])+"){"+Ejecuccion((SimpleNode) raiz.children[1])+"}";     
+                   if (raiz.children.length == 3) {
+                        Respuesta+= Ejecuccion((SimpleNode) raiz.children[2]);
+                    }
+                }
                 
+                
+            break;
+            
+            case 55://Else
+                if(Ejecutar){
+                 Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);   
+                }else{
+                    Respuesta= "SINO{"+Ejecuccion((SimpleNode) raiz.children[0])+"}";
+                }
+                 
             break;
             
             case 69://Logica 
@@ -1827,7 +1863,7 @@ public class Manejo implements Datos.Iface {
                         
                         Respuesta=relacional(op1,op2,operacion);
                     }else{
-                        
+                        Respuesta=Ejecuccion((SimpleNode) raiz.children[0])+" "+Ejecuccion((SimpleNode) raiz.children[1]);
                     }
                 } else {
                     Respuesta = Ejecuccion((SimpleNode) raiz.children[0]);
@@ -1854,7 +1890,7 @@ public class Manejo implements Datos.Iface {
                          Respuesta =((SimpleNode) raiz.children[0]).name +";"+ Ejecuccion((SimpleNode) raiz.children[1]); 
                      }else{
                      Respuesta =((SimpleNode) raiz.children[0]).name + Ejecuccion((SimpleNode) raiz.children[1]); 
-                     }                     
+                     }                 
                 }
                  
             break;

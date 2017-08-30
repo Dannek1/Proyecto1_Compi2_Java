@@ -1466,14 +1466,28 @@ void Modo_Orden():
 {/*@bgen(jjtree) Modo_Orden */
          try {
 /*@egen*/
-	 <R_ASC>
-	|<R_DESC>/*@bgen(jjtree)*/
+	 r_asc()
+	|r_desc()/*@bgen(jjtree)*/
+         } catch (Throwable jjte000) {
+           if (jjtc000) {
+             jjtree.clearNodeScope(jjtn000);
+             jjtc000 = false;
+           } else {
+             jjtree.popNode();
+           }
+           if (jjte000 instanceof RuntimeException) {
+             throw (RuntimeException)jjte000;
+           }
+           if (jjte000 instanceof ParseException) {
+             throw (ParseException)jjte000;
+           }
+           throw (Error)jjte000;
          } finally {
            if (jjtc000) {
              jjtree.closeNodeScope(jjtn000, true);
            }
          }
-/*@egen*/
+/*@egen*/	
 }
 
 void Otorgar():
@@ -1485,7 +1499,7 @@ void Otorgar():
 {/*@bgen(jjtree) Otorgar */
         try {
 /*@egen*/
-	<R_OTORGAR><R_PERMISOS>r_id()<COMA>r_id()<PUNTO>Objeto()/*@bgen(jjtree)*/
+	<R_OTORGAR><R_PERMISOS>r_id()<COMA>r_id()<PUNTO>Objeto() r_punto_coma()/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1550,7 +1564,7 @@ void Denegar():
 {/*@bgen(jjtree) Denegar */
         try {
 /*@egen*/
-	<R_DENEGAR><R_PERMISOS>r_id()<COMA>r_id()<PUNTO>Objeto()/*@bgen(jjtree)*/
+	<R_DENEGAR><R_PERMISOS>r_id()<COMA>r_id()<PUNTO>Objeto() r_punto_coma()/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1582,7 +1596,7 @@ void back():
 {/*@bgen(jjtree) back */
         try {
 /*@egen*/
-	<R_BACKUP>tipo_back()r_id()r_punto_coma()/*@bgen(jjtree)*/
+	<R_BACKUP>tipo_back()r_id() r_id()r_punto_coma()/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1615,8 +1629,22 @@ void tipo_back():
 {/*@bgen(jjtree) tipo_back */
          try {
 /*@egen*/
-	 <R_USQLDUMP>
-	|<R_COMPLETO>/*@bgen(jjtree)*/
+	 r_umsql()
+	|r_completo()/*@bgen(jjtree)*/
+         } catch (Throwable jjte000) {
+           if (jjtc000) {
+             jjtree.clearNodeScope(jjtn000);
+             jjtc000 = false;
+           } else {
+             jjtree.popNode();
+           }
+           if (jjte000 instanceof RuntimeException) {
+             throw (RuntimeException)jjte000;
+           }
+           if (jjte000 instanceof ParseException) {
+             throw (ParseException)jjte000;
+           }
+           throw (Error)jjte000;
          } finally {
            if (jjtc000) {
              jjtree.closeNodeScope(jjtn000, true);
@@ -1634,7 +1662,7 @@ void restaurar():
 {/*@bgen(jjtree) restaurar */
         try {
 /*@egen*/
-	<R_RESTAURAR>tipo_back()/*@bgen(jjtree)*/
+	<R_RESTAURAR>tipo_back() aritmetica() r_punto_coma()/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1698,9 +1726,9 @@ void alterado():
 {/*@bgen(jjtree) alterado */
          try {
 /*@egen*/
-	 <R_TABLA>r_id() accion_alterado_tabla()r_punto_coma()
-	|<R_OBJETO>r_id() accion_alterado_objeto()r_punto_coma()
-	|<R_USUARIO>r_id() <R_CAMBIAR> <R_PAS> <I_ASIG>Expresion()r_punto_coma()/*@bgen(jjtree)*/
+	 r_tabla() r_id() accion_alterado_tabla()r_punto_coma()
+	|r_objeto() r_id() accion_alterado_objeto()r_punto_coma()
+	|r_usario() r_id() <R_CAMBIAR> <R_PAS> <I_ASIG>Expresion()r_punto_coma()/*@bgen(jjtree)*/
          } catch (Throwable jjte000) {
            if (jjtc000) {
              jjtree.clearNodeScope(jjtn000);
@@ -2018,7 +2046,7 @@ void IF():
 {/*@bgen(jjtree) IF */
         try {
 /*@egen*/
-	<R_SI> <PAR_IZ>logica()<PAR_DER><COR_IZ>(SubSentencia())+<COR_Der>(sino_else())?/*@bgen(jjtree)*/
+	<R_SI> <PAR_IZ>logica()<PAR_DER><COR_IZ>SubSentencias()<COR_Der>(sino_else())?/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -3741,6 +3769,183 @@ void logica_Conusltas2():
       jjtree.closeNodeScope(jjtn000, true);
     }
   }
+/*@egen*/
+}
+
+void r_asc()    :
+{/*@bgen(jjtree) ASC */
+        SimpleNode jjtn000 = new SimpleNode(JJTASC);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Token t;
+}
+{/*@bgen(jjtree) ASC */
+        try {
+/*@egen*/
+	t=<R_ASC>/*@bgen(jjtree)*/
+                 {
+                   jjtree.closeNodeScope(jjtn000, true);
+                   jjtc000 = false;
+                 }
+/*@egen*/{jjtn000.setName(t.image);}/*@bgen(jjtree)*/
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
+}
+
+
+void r_desc()     :
+{/*@bgen(jjtree) DESC */
+        SimpleNode jjtn000 = new SimpleNode(JJTDESC);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Token t;
+}
+{/*@bgen(jjtree) DESC */
+        try {
+/*@egen*/
+	t=<R_DESC>/*@bgen(jjtree)*/
+                  {
+                    jjtree.closeNodeScope(jjtn000, true);
+                    jjtc000 = false;
+                  }
+/*@egen*/{jjtn000.setName(t.image);}/*@bgen(jjtree)*/
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
+}
+
+void r_umsql()         :
+{/*@bgen(jjtree) USQLDUMP */
+        SimpleNode jjtn000 = new SimpleNode(JJTUSQLDUMP);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Token t;
+}
+{/*@bgen(jjtree) USQLDUMP */
+        try {
+/*@egen*/
+	t=<R_USQLDUMP>/*@bgen(jjtree)*/
+                      {
+                        jjtree.closeNodeScope(jjtn000, true);
+                        jjtc000 = false;
+                      }
+/*@egen*/{jjtn000.setName(t.image);}/*@bgen(jjtree)*/
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
+}
+
+
+void r_completo()         :
+{/*@bgen(jjtree) COMPLETO */
+        SimpleNode jjtn000 = new SimpleNode(JJTCOMPLETO);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Token t;
+}
+{/*@bgen(jjtree) COMPLETO */
+        try {
+/*@egen*/
+	t=<R_COMPLETO>/*@bgen(jjtree)*/
+                      {
+                        jjtree.closeNodeScope(jjtn000, true);
+                        jjtc000 = false;
+                      }
+/*@egen*/{jjtn000.setName(t.image);}/*@bgen(jjtree)*/
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
+}
+
+void r_tabla()      :
+{/*@bgen(jjtree) TABLA */
+        SimpleNode jjtn000 = new SimpleNode(JJTTABLA);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Token t;
+}
+{/*@bgen(jjtree) TABLA */
+        try {
+/*@egen*/
+	t=<R_TABLA>/*@bgen(jjtree)*/
+                   {
+                     jjtree.closeNodeScope(jjtn000, true);
+                     jjtc000 = false;
+                   }
+/*@egen*/{jjtn000.setName(t.image);}/*@bgen(jjtree)*/
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
+}
+
+void r_objeto()       :
+{/*@bgen(jjtree) OBJETO */
+        SimpleNode jjtn000 = new SimpleNode(JJTOBJETO);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Token t;
+}
+{/*@bgen(jjtree) OBJETO */
+        try {
+/*@egen*/
+	t=<R_OBJETO>/*@bgen(jjtree)*/
+                    {
+                      jjtree.closeNodeScope(jjtn000, true);
+                      jjtc000 = false;
+                    }
+/*@egen*/{jjtn000.setName(t.image);}/*@bgen(jjtree)*/
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
+}
+
+void r_usario()        :
+{/*@bgen(jjtree) USUARIO */
+        SimpleNode jjtn000 = new SimpleNode(JJTUSUARIO);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Token t;
+}
+{/*@bgen(jjtree) USUARIO */
+        try {
+/*@egen*/
+	t=<R_USUARIO>/*@bgen(jjtree)*/
+                     {
+                       jjtree.closeNodeScope(jjtn000, true);
+                       jjtc000 = false;
+                     }
+/*@egen*/{jjtn000.setName(t.image);}/*@bgen(jjtree)*/
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
 /*@egen*/
 }
 

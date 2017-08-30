@@ -469,14 +469,14 @@ void Ordenamiento():
 void Modo_Orden():
 {}
 {
-	 <R_ASC>
-	|<R_DESC>
+	 r_asc()
+	|r_desc()	
 }
 
 void Otorgar():
 {}
 {
-	<R_OTORGAR><R_PERMISOS>r_id()<COMA>r_id()<PUNTO>Objeto()
+	<R_OTORGAR><R_PERMISOS>r_id()<COMA>r_id()<PUNTO>Objeto() r_punto_coma()
 }
 
 void Objeto():
@@ -489,27 +489,27 @@ void Objeto():
 void Denegar():
 {}
 {
-	<R_DENEGAR><R_PERMISOS>r_id()<COMA>r_id()<PUNTO>Objeto()
+	<R_DENEGAR><R_PERMISOS>r_id()<COMA>r_id()<PUNTO>Objeto() r_punto_coma()
 }
 
 void back():
 {}
 {
-	<R_BACKUP>tipo_back()r_id()r_punto_coma()
+	<R_BACKUP>tipo_back()r_id() r_id()r_punto_coma()
         
 }
 
 void tipo_back():
 {}
 {
-	 <R_USQLDUMP>
-	|<R_COMPLETO>
+	 r_umsql()
+	|r_completo()
 }
 
 void restaurar():
 {}
 {
-	<R_RESTAURAR>tipo_back()
+	<R_RESTAURAR>tipo_back() aritmetica() r_punto_coma()
 }
 
 void Alterar():
@@ -521,9 +521,9 @@ void Alterar():
 void alterado():
 {}
 {
-	 <R_TABLA>r_id() accion_alterado_tabla()r_punto_coma()
-	|<R_OBJETO>r_id() accion_alterado_objeto()r_punto_coma()
-	|<R_USUARIO>r_id() <R_CAMBIAR> <R_PAS> <I_ASIG>Expresion()r_punto_coma()
+	 r_tabla() r_id() accion_alterado_tabla()r_punto_coma()
+	|r_objeto() r_id() accion_alterado_objeto()r_punto_coma()
+	|r_usario() r_id() <R_CAMBIAR> <R_PAS> <I_ASIG>Expresion()r_punto_coma()
         
 }
 
@@ -595,7 +595,7 @@ void Asignacion():
 void IF():
 {}
 {
-	<R_SI> <PAR_IZ>logica()<PAR_DER><COR_IZ>(SubSentencia())+<COR_Der>(sino_else())?
+	<R_SI> <PAR_IZ>logica()<PAR_DER><COR_IZ>SubSentencias()<COR_Der>(sino_else())?
         
 }
 
@@ -1039,6 +1039,64 @@ void logica_Conusltas2():
 {
   LOOKAHEAD(2)operador_consulta2() aritmetica() operador_consulta() aritmetica()
   |LOOKAHEAD(2)operador_consulta2() <R_PAS> operador_consulta() aritmetica()
+}
+
+void r_asc()#ASC:
+{
+	Token t;
+}
+{
+	t=<R_ASC>{jjtThis.setName(t.image);}
+}
+
+
+void r_desc()#DESC:
+{
+	Token t;
+}
+{
+	t=<R_DESC>{jjtThis.setName(t.image);}
+}
+
+void r_umsql()#USQLDUMP:
+{
+	Token t;
+}
+{
+	t=<R_USQLDUMP>{jjtThis.setName(t.image);}
+}
+
+
+void r_completo()#COMPLETO:
+{
+	Token t;
+}
+{
+	t=<R_COMPLETO>{jjtThis.setName(t.image);}
+}
+
+void r_tabla()#TABLA:
+{
+	Token t;
+}
+{
+	t=<R_TABLA>{jjtThis.setName(t.image);}
+}
+
+void r_objeto()#OBJETO:
+{
+	Token t;
+}
+{
+	t=<R_OBJETO>{jjtThis.setName(t.image);}
+}
+
+void r_usario()#USUARIO:
+{
+	Token t;
+}
+{
+	t=<R_USUARIO>{jjtThis.setName(t.image);}
 }
 
 JAVACODE 

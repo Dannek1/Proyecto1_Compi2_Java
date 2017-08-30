@@ -595,7 +595,7 @@ void Asignacion():
 void IF():
 {}
 {
-	<R_SI> <PAR_IZ>logica()<PAR_DER><COR_IZ>(SubSentencia())+<COR_Der>(sino_else())?
+	<R_SI> <PAR_IZ>logica()<PAR_DER><COR_IZ>SubSentencias()<COR_Der>(sino_else())?
         
 }
 
@@ -1098,8 +1098,6 @@ void r_usario()#USUARIO:
 {
 	t=<R_USUARIO>{jjtThis.setName(t.image);}
 }
-
-
 
 JAVACODE 
 void error_skipto(int kind) { 
