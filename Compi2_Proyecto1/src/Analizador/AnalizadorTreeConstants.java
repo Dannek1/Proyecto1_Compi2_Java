@@ -112,7 +112,13 @@ public interface AnalizadorTreeConstants
   public int JJTOPERADOR_CONSULTA = 106;
   public int JJTOPERADOR_CONSULTA2 = 107;
   public int JJTLOGICA_CONUSLTAS2 = 108;
-  public int JJTERROR_SKIPTO = 109;
+  public int JJTASC = 109;
+  public int JJTDESC = 110;
+  public int JJTUSQLDUMP = 111;
+  public int JJTCOMPLETO = 112;
+  public int JJTTABLA = 113;
+  public int JJTUSUARIO = 114;
+  public int JJTERROR_SKIPTO = 115;
 
 
   public String[] jjtNodeName = {
@@ -225,7 +231,13 @@ public interface AnalizadorTreeConstants
     "operador_consulta",
     "operador_consulta2",
     "logica_Conusltas2",
+    "ASC",
+    "DESC",
+    "USQLDUMP",
+    "COMPLETO",
+    "TABLA",
+    "USUARIO",
     "error_skipto",
   };
 }
-/* JavaCC - OriginalChecksum=4e5ad10b2f37a678ea4353bfba5975dc (do not edit this line) */
+/* JavaCC - OriginalChecksum=10770bcb83b550eddddd4f0ebf13341a (do not edit this line) */
