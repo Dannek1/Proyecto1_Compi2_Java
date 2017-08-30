@@ -57,7 +57,7 @@ public class Manejo implements Datos.Iface {
         try{
         SimpleNode raiz =a.Programa();
         
-        Lectura=Ejecuccion(raiz);
+        
         
         Handler h=new Handler();
         h.agregarNumero(raiz);
@@ -67,36 +67,42 @@ public class Manejo implements Datos.Iface {
         
         
         
-        if(sentencias[0].equals("login")){
-            
-            Lectura=Lectura.substring(0, Lectura.length()-1);
-            
-            Respuesta="[ \n \"validar\": 1500 ,\n \"login\":[\n";
-            
-            String[] Resultados=Lectura.split(";");
-            
-            int x=0;
-            
-            while(x<Resultados.length){
-                
-                if(Resultados[x].contains("usuario")){
-                    String[] temp=Resultados[x].split(",");
+            if (sentencias[0].equals("login")) {
+                Lectura = Ejecuccion(raiz);
+
+                if (!Lectura.equals("")) {
+                    Lectura = Lectura.substring(0, Lectura.length() - 1);
+
+                    Respuesta = "[ \n \"validar\": 1500 ,\n \"login\":[\n";
+
+                    String[] Resultados = Lectura.split(";");
+
+                    int x = 0;
+
+                    while (x < Resultados.length) {
+
+                        if (Resultados[x].contains("usuario")) {
+                            String[] temp = Resultados[x].split(",");
+
+                            Respuesta += "\"usuario\":\"" + temp[1] + "\",\n";
+                        }
+
+                        if (Resultados[x].contains("nombre")) {
+                            String[] temp = Resultados[x].split(",");
+
+                            Respuesta += "\"nombre\":\"" + temp[1] + "\",\n";
+                        }
+                        x++;
+
+                    }
+
+                    Respuesta += "\"login\":true \n ] \n ]";
                     
-                    Respuesta+="\"usuario\":\""+ temp[1]+"\",\n";
+                }else{
+                    Respuesta="[ \"login\":false]";
                 }
-                
-                if(Resultados[x].contains("nombre")){
-                    String[] temp=Resultados[x].split(",");
-                    
-                    Respuesta+="\"nombre\":\""+ temp[1]+"\",\n";
-                }
-                
-                
+
             }
-            
-            Respuesta+=""
-            
-        }
         
         
         
@@ -105,7 +111,7 @@ public class Manejo implements Datos.Iface {
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Manejo.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return cadena;
+        return Respuesta;
     }
     
     boolean XML_Correcto(String path) throws FileNotFoundException{
