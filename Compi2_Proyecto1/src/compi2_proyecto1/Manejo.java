@@ -1088,8 +1088,12 @@ public class Manejo implements Datos.Iface {
     
     String Selecionar(String Campos, String Tabla,String Condiciones){
         String Respuesta="";
-        Condiciones=EliminaCaracteres(Condiciones);
-        Condiciones=EliminaEspacios(Condiciones);
+        
+        if(!Condiciones.equals("")){
+         Condiciones=EliminaCaracteres(Condiciones);
+         Condiciones=EliminaEspacios(Condiciones);   
+        }
+        
         
         if(Tabla.equals("usuarios")){
             try {
@@ -1116,43 +1120,41 @@ public class Manejo implements Datos.Iface {
                     
                     Valores=Valores.toLowerCase();
                     
-                    String[] Registros=Valores.split("#");
-                    
-                    String[] Condicion=Condiciones.split("&&");
-                    
-                    String cond="";
-                    
-                    for(int x=0;x<Condicion.length;x++){
-                        String[] temp=Condicion[x].split("==");
-                        cond+=temp[0]+","+temp[1]+";";                        
-                    }
-                    String[] term=cond.split(";");
-                    
-                    boolean resultado=false;
-                    
-                    for(int x=0;x<Registros.length;x++){
-                        
-                        int y=0;
-                        
-                        while(y<term.length){
-                            if(Registros[x].contains(term[y])){
-                                resultado=true;
-                                y++;
-                            }else{
-                                resultado=false;
-                                break;
+                    String[] Registros = Valores.split("#");
+
+                    if (!Condiciones.equals("")) {
+                        String[] Condicion = Condiciones.split("&&");
+
+                        String cond = "";
+
+                        for (int x = 0; x < Condicion.length; x++) {
+                            String[] temp = Condicion[x].split("==");
+                            cond += temp[0] + "," + temp[1] + ";";
+                        }
+                        String[] term = cond.split(";");
+
+                        boolean resultado = false;
+
+                        for (int x = 0; x < Registros.length; x++) {
+
+                            int y = 0;
+
+                            while (y < term.length) {
+                                if (Registros[x].contains(term[y])) {
+                                    resultado = true;
+                                    y++;
+                                } else {
+                                    resultado = false;
+                                    break;
+                                }
+                            }
+
+                            if (resultado) {
+                                Respuesta += Registros[x] + "#";
                             }
                         }
-                        
-                        if(resultado){
-                            Respuesta+=Registros[x]+"#";
-                        }
-                    }
-                    
-                    
-                    
-                    
-         
+                    }                  
+
                 }else{
                     
                 }                           
@@ -1561,7 +1563,7 @@ public class Manejo implements Datos.Iface {
                      
                      Respuesta=Selecionar(campos,tabla_busqueda,Condiciones);
                     }else{
-                        
+                        Respuesta=Selecionar(campos,tabla_busqueda,"");
                     }
                 }else{
                     
