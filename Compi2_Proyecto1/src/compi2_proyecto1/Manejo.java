@@ -1252,6 +1252,25 @@ public class Manejo implements Datos.Iface {
         
     }
     
+    boolean Es_Variable(String Nombre, String Ambito){
+        boolean Respuesta=false;
+        
+        Variable temp=variables.Buscar(Nombre);
+        
+        if(temp==null){
+            Respuesta=false;
+        }else{
+            
+            if(temp.getAmbito().equals(Ambito)||temp.getAmbito().equals("Global")){
+                Respuesta=true;
+            }else{
+                Respuesta=false;
+            }            
+        }
+        
+        return Respuesta;
+    }
+    
     public String Ejecuccion(SimpleNode raiz) throws FileNotFoundException{
         String Respuesta="";
         int id=raiz.id;
@@ -1796,6 +1815,14 @@ public class Manejo implements Datos.Iface {
                  
             break;
             
+            case 56://Switch
+                
+            break;
+            
+            case 61:
+            
+            break;
+            
             case 69://Logica 
              
                 Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
@@ -2142,6 +2169,17 @@ public class Manejo implements Datos.Iface {
     
     String Suma_REsta(String op1,String op2,String op){
         String Respuesta="";
+        
+        if(Es_Variable(op1,AMBITO)){
+         Variable temp=variables.Buscar(op1);
+         op1=temp.getValor();
+        }
+        
+        if(Es_Variable(op2,AMBITO)){
+         Variable temp=variables.Buscar(op2);
+         op2=temp.getValor();
+        }
+        
         switch (op) {
 
             case "+":
@@ -2410,6 +2448,16 @@ public class Manejo implements Datos.Iface {
     
     String Multi_DIv(String op1,String op2,String op){
         String Respuesta="";
+        
+         if(Es_Variable(op1,AMBITO)){
+         Variable temp=variables.Buscar(op1);
+         op1=temp.getValor();
+        }
+        
+        if(Es_Variable(op2,AMBITO)){
+         Variable temp=variables.Buscar(op2);
+         op2=temp.getValor();
+        }
         
         switch (op) {
             
@@ -2683,6 +2731,17 @@ public class Manejo implements Datos.Iface {
     
     String potencia(String op1,String op2){
         String Respuesta="";
+        
+         if(Es_Variable(op1,AMBITO)){
+         Variable temp=variables.Buscar(op1);
+         op1=temp.getValor();
+        }
+        
+        if(Es_Variable(op2,AMBITO)){
+         Variable temp=variables.Buscar(op2);
+         op2=temp.getValor();
+        }
+        
         if (op1.equals("true") || op1.equals("false") || op1.equals("1") || op1.equals("0")) {
             //op2 booleano
             if (op2.equals("true") || op2.equals("false") || op2.equals("1") || op2.equals("0")) {
@@ -2812,6 +2871,16 @@ public class Manejo implements Datos.Iface {
     String relacional(String op1,String op2,String op){
         String Respuesta="";
                 
+         if(Es_Variable(op1,AMBITO)){
+         Variable temp=variables.Buscar(op1);
+         op1=temp.getValor();
+        }
+        
+        if(Es_Variable(op2,AMBITO)){
+         Variable temp=variables.Buscar(op2);
+         op2=temp.getValor();
+        }
+        
             switch (op) {
                 
                 case "==":

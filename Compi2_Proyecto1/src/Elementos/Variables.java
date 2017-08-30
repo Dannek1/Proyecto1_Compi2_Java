@@ -39,6 +39,39 @@ public class Variables {
         }
     }
     
+    public void Eliminar(String Nombre,String Ambito){
+        Aux=Cabeza;
+        
+        boolean seguir=true;
+        
+        while(seguir){
+            if(Aux.getAmbito().equals(Ambito)&&Aux.Nombre.equals(Nombre)){
+                
+                if(Aux==Cabeza){
+                    Cabeza.Siguiente.Anterior=null;
+                    Cabeza=Cabeza.Siguiente;
+                    
+                }else if(Aux==Ultimo){
+                    Ultimo.Anterior.Siguiente=null;
+                    Ultimo=Ultimo.Anterior;
+                    
+                }else{
+                    Aux.Anterior.Siguiente=Aux.Siguiente;
+                    Aux.Siguiente.Anterior=Aux.Anterior;
+                }
+                
+                seguir=false;
+            }else{
+                if(Aux.Siguiente!=null){
+                    Aux=Aux.Siguiente;
+                }else{
+                    seguir=false;
+                }
+            } 
+        }
+        
+    }
+    
     public Variable Buscar(String nombre){
         Variable Respuesta=null;
         Aux=Cabeza;
@@ -49,7 +82,13 @@ public class Variables {
                 Respuesta=Aux;
                 seguir=false;
             }else{
-                Aux=Aux.Siguiente;
+                if(Aux.Siguiente!=null){
+                    Aux=Aux.Siguiente;
+                }else{
+                    seguir=false;
+                    Respuesta=null;
+                }
+                
             }
         }      
                 

@@ -13,7 +13,7 @@ public class Variable {
     String Nombre;
     private String Tipo;
     private String Valor;
-    String Ambito;
+    private String Ambito;
     
     Variable Siguiente;
     Variable Anterior;
@@ -53,6 +53,20 @@ public class Variable {
      */
     public void setTipo(String Tipo) {
         this.Tipo = Tipo;
+    }
+
+    /**
+     * @return the Ambito
+     */
+    public String getAmbito() {
+        return Ambito;
+    }
+
+    /**
+     * @param Ambito the Ambito to set
+     */
+    public void setAmbito(String Ambito) {
+        this.Ambito = Ambito;
     }
     
 }
