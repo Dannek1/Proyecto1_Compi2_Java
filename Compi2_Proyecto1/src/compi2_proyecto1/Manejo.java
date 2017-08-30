@@ -27,7 +27,7 @@ import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import org.w3c.dom.NodeList;
 
-
+import Elementos.*;
 /**
  *
  * @author Dannek
@@ -38,11 +38,13 @@ public class Manejo implements Datos.Iface {
     String TABLA_aux="";
     String CAMPOS_aux="";
     String VALORES_aux="";
+    String AMBITO="Global";
     int hacer=0;
     boolean Ejecutar=true;
     
     Anlisis_XML LeerXML=new Anlisis_XML();
     Analisis_Paquete LeerPaquete=new Analisis_Paquete();
+    Variables variables=new Variables();
     
     @Override
     public String Paquete(String cadena) throws TException {
@@ -1177,6 +1179,79 @@ public class Manejo implements Datos.Iface {
         return Respuesta;
     }
     
+    void Declarar(String nombres,String Ambito,String Valor,String tipo){
+        
+        String[] nombre=nombres.split(",");
+        
+        for(int x=0;x<nombre.length;x++){
+            Variable temp=new Variable(nombre[x],tipo,Ambito);
+            variables.Insertar(temp);
+            Asignacion(nombre[x],Valor);
+        }
+    }
+    
+    void Asignacion(String Variable,String Valor){
+        
+        Variable temp=variables.Buscar(Variable);
+        
+        switch (temp.getTipo()){
+            
+            case "TEXT":
+                if(Valor.charAt(0)=='\"'){
+                    temp.setValor(Valor);
+                }else{
+                    System.out.println("Error: Tipos Incompatibles");
+                }
+            break;
+            
+            case "INTEGER": 
+                if(isNumeric(Valor)){
+                    temp.setValor(Valor);
+                }else{
+                    System.out.println("Error: Tipos Incompatibles");
+                }
+            break;
+            
+            case "DOUBLE": 
+                if(isDouble(Valor)){
+                    temp.setValor(Valor);
+                }else{
+                    System.out.println("Error: Tipos Incompatibles");
+                }
+            break;
+            
+            case "BOOL": 
+                if(Valor.equals("verdadero")||Valor.equals("1")||Valor.equals("falso")||Valor.equals("0")){
+                    if(Valor.equals("verdadero")||Valor.equals("1")){
+                        temp.setValor("true");
+                    }else{
+                        temp.setValor("false");
+                    }
+                    
+                }else{
+                    System.out.println("Error: Tipos Incompatibles");
+                }
+            break;
+            
+            case "DATE":
+                if(Valor.matches("[1-3]*[0-9][-][0-1][0-9][-][1-9][0-9][0-9][0-9]")){
+                    temp.setValor(Valor);
+                }else{
+                    System.out.println("Error: Tipos Incompatibles");
+                }
+            break;  
+            
+            case "DATETIME":
+                if(Valor.matches("[1-3]*[0-9][-][0-1][0-9][-][1-9][0-9][0-9][0-9][\" ][0-2]*[0-9][:][0-5][0-9][:][0-5][0-9]")){
+                    temp.setValor(Valor);
+                }else{
+                    System.out.println("Error: Tipos Incompatibles");
+                }
+            break;   
+        }
+        
+    }
+    
     public String Ejecuccion(SimpleNode raiz) throws FileNotFoundException{
         String Respuesta="";
         int id=raiz.id;
@@ -1418,23 +1493,7 @@ public class Manejo implements Datos.Iface {
                 
             break;
             
-            case 88://SubSentencia
-                if (raiz.children.length > 1) {
-                    Respuesta = Ejecuccion((SimpleNode) raiz.children[0]) ;
-
-                    for (int x = 1; x < raiz.children.length; x++) {
-                        Respuesta += "\n"+Ejecuccion((SimpleNode) raiz.children[x]);
-                    }
-
-                } else {
-                    Respuesta = Ejecuccion((SimpleNode) raiz.children[0]);
-                }
-                break;
-                
-            case 22://Retorno
-                Respuesta = Ejecuccion((SimpleNode) raiz.children[0]) ;
-                
-            break;
+            
             
             case 23://Crear Usuario
                 if(Ejecutar){
@@ -1555,6 +1614,12 @@ public class Manejo implements Datos.Iface {
                 Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
             break;
             
+            case 32://Borrar
+                String Tabla=((SimpleNode) raiz.children[0]).name;;
+                String condicion=Ejecuccion((SimpleNode) raiz.children[1]);
+                //Borrar(Tabla,condicion);
+            break;
+            
             case 33: //Seleccionar
                 if(Ejecutar){
                    String campos=Ejecuccion((SimpleNode) raiz.children[0]);
@@ -1588,8 +1653,113 @@ public class Manejo implements Datos.Iface {
                     Respuesta="*";
                 }
             break;
+             
+            case 35://Ordenamiento
+                Respuesta=((SimpleNode) raiz.children[0]).name+";"+Ejecuccion((SimpleNode) raiz.children[1]);
+            break;
+            
+            case 36:
+                Respuesta=((SimpleNode) raiz.children[0]).name;
+            break;
+            
+            case 37://Otorgar
+                String usuario_Otor=((SimpleNode) raiz.children[0]).name;
+                String Base_Otor=((SimpleNode) raiz.children[1]).name;
+                String Objet_Otor=Ejecuccion((SimpleNode) raiz.children[2]);
+                //Otorar_Permiso()
+            break;
+            
+            case 38://Objeto Otorgar
+                try {
                     
+                    if(raiz.children.length==1){
+                        Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Respuesta="*";
+                }
+            break;
+            
+            case 39://Denegar
+                String usuario_Deneg=((SimpleNode) raiz.children[0]).name;
+                String Base_Deneg=((SimpleNode) raiz.children[1]).name;
+                String Objet_Deneg=Ejecuccion((SimpleNode) raiz.children[2]);
+                //DenegarPermisos
+            break;
+            
+            case 40://back
+                String Tipo_back=Ejecuccion((SimpleNode) raiz.children[0]);
+                String Base_back=((SimpleNode) raiz.children[1]).name;
+                String Archivo_back=((SimpleNode) raiz.children[2]).name;
+                
+            break;
+            
+            case 41://tipo back
+                Respuesta=((SimpleNode) raiz.children[0]).name;
+            break;
+            
+            case 42://restaurar
+                String Tipo_restaurar=Ejecuccion((SimpleNode) raiz.children[0]);
+                String Archivo_rest=((SimpleNode) raiz.children[1]).name;
+            break;
+            
+            case 43:
+                Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
+            break;
+            
+            case 44://alterado
+                String alterado=((SimpleNode) raiz.children[0]).name;
+                
+            break;
+            
+            case 49://Declarar
+                if (Ejecutar) {
+                    String variables = Ejecuccion((SimpleNode) raiz.children[0]);
+                    String Tipo = ((SimpleNode) raiz.children[1]).name;
+                    if (raiz.children.length == 4) {
+                        String Valor = Ejecuccion((SimpleNode) raiz.children[2]);
+                        Declarar(variables, AMBITO, Valor, Tipo);
+                    } else {
+                        Declarar(variables, AMBITO, "", Tipo);
+                    }
+                } else {
+                    if (raiz.children.length == 4) {
+                        Respuesta="DECLARAR "+Ejecuccion((SimpleNode) raiz.children[0])+" "+((SimpleNode) raiz.children[1]).name +"="+Ejecuccion((SimpleNode) raiz.children[2]);
+                    }else{
+                        Respuesta="DECLARAR "+Ejecuccion((SimpleNode) raiz.children[0])+" "+((SimpleNode) raiz.children[1]).name;
+                    }
                     
+                }
+
+            break;
+            
+            case 50://Lista Variables
+                if(raiz.children.length==2){
+                    Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
+                    Respuesta+=","+Ejecuccion((SimpleNode) raiz.children[1]);
+                }else{
+                    Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
+                }
+            break;
+            
+            case 51://Variable
+                Respuesta=((SimpleNode) raiz.children[0]).name;
+            break;
+            
+            case 52://Asignacion declaracion
+                if(raiz.children.length==2){
+                    //Ejecutar Funcion
+                }else{
+                    Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
+                }
+            break;
+            
+            case 53://Asignacion
+                
+            break;
+            
             case 69://Logica 
              
                 Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
@@ -1852,6 +2022,24 @@ public class Manejo implements Datos.Iface {
             
             case 82://Expresion
                 Respuesta=((SimpleNode) raiz.children[0]).name;
+            break;
+            
+            case 88://SubSentencia
+                if (raiz.children.length > 1) {
+                    Respuesta = Ejecuccion((SimpleNode) raiz.children[0]) ;
+
+                    for (int x = 1; x < raiz.children.length; x++) {
+                        Respuesta += "\n"+Ejecuccion((SimpleNode) raiz.children[x]);
+                    }
+
+                } else {
+                    Respuesta = Ejecuccion((SimpleNode) raiz.children[0]);
+                }
+                break;
+                
+            case 22://Retorno
+                Respuesta = Ejecuccion((SimpleNode) raiz.children[0]) ;
+                
             break;
             
             case 105://logica consultas
