@@ -1,0 +1,140 @@
+options
+{
+ CHOICE_AMBIGUITY_CHECK=4;
+ STATIC=false;
+ FORCE_LA_CHECK=false;
+ IGNORE_CASE=true;
+
+}
+
+PARSER_BEGIN(Analizador_Paquetes)
+
+package Analizador_Paquetes;
+
+
+import java.io.*;
+
+
+public class Analizador_Paquetes 
+{
+
+
+}
+PARSER_END(Analizador_Paquetes)
+
+TOKEN:
+{
+	 <ABRIR:"[">
+	|<CERRAR:"]">
+	|<R_VALIDAR:"\"validar\"">
+	|<R_LOGIN:"\"login\"">
+	|<R_COMANDO:"\"comando\"">
+	|<R_PAQUETE:"\"paquete\"">
+	|<R_INTRUCCION: "\"instruccion\"">
+	|<R_USQL:"\"usql\"">
+	|<R_REPORTE:"\"reporte\"">
+	|<R_FIN:"\"fin\"">
+	|<DOS_PUNTOS:":">
+	|<COMA:",">
+        |<COMILLAS:"\"">
+	|<ENTERO : (["0"-"9"])+>
+	|<INSTRUCCIONES:   ["a"-"z","A"-"Z","@"](~[])*["}",";"]>	
+}
+
+SKIP : 
+{ 
+	    " "
+        |"\n" 
+        | "\r\n"
+        |"\r" 
+        | "\t"
+        | "\f"
+}
+
+SimpleNode Programa()#PROGRAMA :
+{}
+{
+	<ABRIR>inicio()<CERRAR><EOF>{return jjtThis;}
+
+}
+
+void inicio():
+{}
+{
+	login()
+	|paquete()
+}
+
+void login():
+{}
+{
+	validar() <COMA> login_S()
+}
+
+void validar():
+{}
+{
+	<R_VALIDAR><DOS_PUNTOS>r_entero()
+}
+
+void login_S():
+{}
+{
+	<R_LOGIN><DOS_PUNTOS><ABRIR><R_COMANDO><DOS_PUNTOS><COMILLAS>r_intrucciones()<COMILLAS><CERRAR>
+}
+
+void r_entero()#ENTERO:
+{
+	Token t;
+}
+{
+	t=<ENTERO>{jjtThis.setName(t.image);}
+}
+
+void r_intrucciones()#INSTRUCCIONES:
+{
+	Token t;
+}
+{
+	t=<INSTRUCCIONES>{jjtThis.setName(t.image);}
+}
+
+void paquete():
+{}
+{
+	<R_PAQUETE><DOS_PUNTOS> tipo_paquete()
+}
+
+void tipo_paquete():
+{}
+{
+	fin()
+	|p_usql()
+	|p_reporte()
+}
+
+void p_usql():
+{}
+{
+	<R_USQL><COMA><R_INTRUCCION><DOS_PUNTOS><COMILLAS>r_intrucciones()<COMILLAS><COMA>
+}
+
+void p_reporte():
+{}
+{
+	<R_REPORTE><COMA><R_INTRUCCION><DOS_PUNTOS><COMILLAS>r_intrucciones()<COMILLAS><COMA>
+}
+
+void fin():
+{}
+{
+	r_fin()
+}
+
+void r_fin()#FIN:
+{
+	Token t;
+}
+{
+	t=<R_FIN>{jjtThis.setName(t.image);}
+}

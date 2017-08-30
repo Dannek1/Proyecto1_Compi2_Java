@@ -1,0 +1,257 @@
+options
+{
+ CHOICE_AMBIGUITY_CHECK=4;
+ STATIC=false;
+ FORCE_LA_CHECK=false;
+ IGNORE_CASE=true;
+
+}
+PARSER_BEGIN(Analizador_XML)
+
+package Analizador_XML;
+
+
+import java.io.*;
+
+
+public class Analizador_XML 
+{
+
+
+}
+PARSER_END(Analizador_XML)
+
+TOKEN:
+{
+	//Etiquetas
+	 <MAESTRO : "<Maestro>">
+	|<C_MAESTRO:"</Maestro>"> 
+	|<V_MAESTRO:"<Maestro/>">
+	|<DB : "<DB>" >
+	|<C_DB:"</DB>">
+	|<BASE:"<Base>">
+	|<C_BASE: "</Base>">
+	|<V_BASE:"<Base/>">
+	|<OBJECT:"<Object>" >
+	|<C_OBJECT: "</Object>">
+	|<PROCEDURE:"<Procedure>">
+	|<C_PROCEDURE: "</Procedure>">
+	|<TABLA : "<Tabla>" >
+	|<C_TABLA:"</Tabla>"> 	
+	|<V_TABLA:"<Tabla/>">
+	|<METODO : "<Metodo>" >
+	|<C_METODO:"</Metodo>">
+	|<V_METODO:"<Metodo/>">
+	|<OBJETO : "<Objeto>" >
+	|<C_OBJETO:"</Objeto>">
+	|<V_OBJETO:"<Objeto/>">
+	|<NOMBRE : "<nombre>" >
+	|<C_NOMBRE:"</nombre>">
+	|<PROC : "<Proc>" >
+	|<C_PROC:"</Proc>">
+	|<OBJ : "<Obj>" >
+	|<C_OBJ:"</Obj>">
+	|<ATTR : "<attr>" >
+	|<C_ATTR:"</attr>">
+	|<PARAMS : "<params>" >
+	|<C_PARAMS:"</params>">
+	|<TIPO_RETURN : "<tipo_retorno>" >
+	|<C_TIPO_RETURN:"</tipo_retorno>">
+	|<RETURN : "<return>" >
+	|<C_RETURN:"</return>">
+	|<SRC : "<src>" >
+	|<C_SRC:"</src>">
+	|<PATH : "<path>" >
+	|<C_PATH:"</path>"> 
+	|<ROWS : "<rows>" >
+	|<C_ROWS:"</rows>"> 
+	|<ROW : "<Row>" >
+	|<C_ROW:"</Row>">
+	|<R_TEXT: "TEXT">
+	|<R_INTEGER:"INTEGER">
+	|<R_DOUBLE:"DOUBLE">
+	|<R_BOOL:"BOOL">
+	|<R_DATE:"DATE">
+	|<R_DATETIME:"DATETIME">
+	|<R_ATRIBUTOS:"Atributos">
+	|<IGUAL:"="> 
+	|<INICIO :"<">
+	|<CIERRE :">">
+	|<FIN:"</">		
+	|<Atributo:  "\""(~["\""])+"\"">
+	|<ID : ["a"-"z","A"-"Z","@"](["a"-"z","A"-"Z","0"-"9","_"])*>
+	|<Propiedasdes: "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>">
+
+	
+}
+SKIP : 
+{ 
+	    " "
+        |"\n" 
+        | "\r\n"
+        |"\r" 
+        | "\t"
+        | "\f"
+}
+
+SimpleNode Programa()#PROGRAMA :
+{}
+{
+	<Propiedasdes>inicio()<EOF>{return jjtThis;}
+
+}
+
+void inicio():
+{}
+{
+	<MAESTRO>maestro()<C_MAESTRO>
+	|<BASE>base()<C_BASE>
+	|<TABLA>tabla()<C_TABLA>
+	|<METODO>(metodos())+<C_METODO>
+	|<OBJETO>(objetos())+<C_OBJETO>
+	|<V_MAESTRO>
+	|<V_BASE>
+	|<V_TABLA>
+	|<V_METODO>
+	|<V_OBJETO>
+}
+
+void maestro():
+{}
+{
+	(<DB>db()<C_DB>)+
+}
+
+void db():
+{}
+{
+	nombre() ruta()
+}
+
+void base():
+{}
+{
+	procB()obB()(tabB())*
+}
+
+
+void tabB():
+{}
+{
+	<TABLA> nombre() ruta()<ROWS>(rows())+<C_ROWS><C_TABLA>
+}
+
+void procB():
+{}
+{
+	<PROCEDURE>ruta()<C_PROCEDURE>
+}
+
+void obB():
+{}
+{
+	<OBJECT>ruta()<C_OBJECT>
+}
+
+void rows():
+{}
+{
+	<INICIO>tipo_dato()(atributos())?<CIERRE>r_atributo()<FIN>tipo_dato()<CIERRE>  
+}
+
+void metodos():
+{}
+{
+	<PROC>nombre()(params())? (tipoR())?intrucciones() (retorno())?<C_PROC>
+}
+
+void tipoR():
+{}
+{
+	<TIPO_RETURN>tipo_dato()<C_TIPO_RETURN>
+}
+
+void params():
+{}
+{
+	<PARAMS>(rows())+<C_PARAMS>
+}			
+
+void intrucciones():
+{}
+{
+	<SRC>(r_atributo())+<C_SRC>
+}
+
+void retorno():
+{}
+{
+	<RETURN>r_atributo()<C_RETURN>
+}
+
+void objetos():
+{}
+{
+	<OBJ> nombre() (attribs())? <C_OBJ>
+}
+
+void attribs():
+{}
+{
+	<ATTR>rows()<C_ATTR>
+}
+
+void tipo_dato()#TIPO_DATO:
+{
+	Token t;
+}
+{
+	 t=<R_TEXT>{jjtThis.setName(t.image);}
+	|t=<R_INTEGER>{jjtThis.setName(t.image);}
+	|t=<R_DOUBLE>{jjtThis.setName(t.image);}
+	|t=<R_BOOL>{jjtThis.setName(t.image);}
+	|t=<R_DATE>{jjtThis.setName(t.image);}
+	|t=<R_DATETIME>{jjtThis.setName(t.image);}
+	
+}
+
+void atributos():
+{}
+{
+	<R_ATRIBUTOS> <IGUAL> r_atributo()
+}
+
+void nombre():
+{}
+{
+	<NOMBRE>r_atributo()<C_NOMBRE>
+
+}
+
+void ruta():
+{}
+{
+	<PATH>r_atributo()<C_PATH>
+}
+
+
+void tabla():
+{}
+{
+	<ROW>(row())+<C_ROW>
+}
+
+void row():
+{}
+{
+	<INICIO><ID><CIERRE>r_atributo()<FIN><ID><CIERRE>
+	|<NOMBRE>r_atributo()<C_NOMBRE>
+}
+
+void r_atributo()#ATRIBUTO:
+{
+	Token t;
+}
+{
+	t=<Atributo>{jjtThis.setName(t.image);}
+}
