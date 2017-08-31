@@ -28,6 +28,9 @@ import javax.xml.transform.Source;
 import org.w3c.dom.NodeList;
 
 import Elementos.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 /**
  *
  * @author Dannek
@@ -1923,6 +1926,24 @@ public class Manejo implements Datos.Iface {
                 
             break;
                 
+            case 65://Fecha
+                String varFecha=((SimpleNode) raiz.children[0]).name;
+                Date date = new Date();
+                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                String valor=dateFormat.format(date);
+                
+                Asignacion(varFecha,valor);
+            break;
+            
+            case 66://FechaHora
+                String varFechaHora=((SimpleNode) raiz.children[0]).name;
+                Date date2 = new Date();
+                DateFormat hourdateFormat = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
+                String valorHora=hourdateFormat.format(date2);
+                
+                Asignacion(varFechaHora,valorHora);
+            break;
+            
             case 69://Logica 
              
                 Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
