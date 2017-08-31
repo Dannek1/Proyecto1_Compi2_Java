@@ -357,7 +357,7 @@ void SubSentencia():
 	|While()
 	|LOOKAHEAD(3)Fecha()
 	|LOOKAHEAD(2)Fecha_Hora()
-	|LOOKAHEAD(2)sentencias()
+	|sentencia()
 }
 
 void C_Funcion():
@@ -610,7 +610,7 @@ void sino_else():
 void Switch():
 {}
 {
-	<R_SELECCIONA><PAR_IZ>Expresion()<PAR_DER><COR_IZ> casos() (defecto())*<COR_Der>
+	<R_SELECCIONA><PAR_IZ>aritmetica()<PAR_DER><COR_IZ> casos() (defecto())?<COR_Der>
         
 }
 

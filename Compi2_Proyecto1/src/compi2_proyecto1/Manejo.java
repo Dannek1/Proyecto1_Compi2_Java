@@ -44,7 +44,9 @@ public class Manejo implements Datos.Iface {
     String AMBITO="Global";
     int hacer=0;
     boolean Ejecutar=true;
+    boolean Ejecutar_Swithc=false;
     boolean Detener=false;
+    String EXP_SWITCH="";
     
     Anlisis_XML LeerXML=new Anlisis_XML();
     Analisis_Paquete LeerPaquete=new Analisis_Paquete();
@@ -1436,7 +1438,7 @@ public class Manejo implements Datos.Iface {
                 } else {
                     System.out.println(((SimpleNode) raiz.children[0]).name);
                     String nombrePRO = ((SimpleNode) raiz.children[0]).name;
-                    Ejecutar=false;
+                    //Ejecutar=false;
                     if (raiz.children.length > 2) {
                     String Param_Objet = Ejecuccion((SimpleNode) raiz.children[1]);
                     String sentencias= Ejecuccion((SimpleNode) raiz.children[2]);
@@ -1824,6 +1826,47 @@ public class Manejo implements Datos.Iface {
             
             case 56://Switch
                 
+                EXP_SWITCH=Ejecuccion((SimpleNode) raiz.children[0]);
+                
+                String r2=Ejecuccion((SimpleNode) raiz.children[1]);
+                
+                if(raiz.children.length==3){
+                    if(Detener==false){
+                        Ejecuccion((SimpleNode) raiz.children[2]);
+                    }
+                    
+                }else{
+                    
+                }
+                
+                Detener=true;
+                
+            break;
+            
+            case 57://Casos
+                if(raiz.children.length==2){
+                    Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
+                    if(Detener==false){
+                    Respuesta=Ejecuccion((SimpleNode) raiz.children[1]);
+                    }
+                }else{
+                    Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
+                }
+            break;
+            
+            case 58://Caso
+                Variable temp1=variables.Buscar(EXP_SWITCH);
+                String caso=Ejecuccion((SimpleNode) raiz.children[0]);
+                
+                if(temp1.getValor().equals(caso) ||Ejecutar_Swithc){
+                    Ejecutar_Swithc=true;
+                    String c=Ejecuccion((SimpleNode) raiz.children[1]);
+                    
+                    if(c.equals(Detener)){
+                        Detener=true;
+                    }
+                }
+                
             break;
             
             case 59://Setencias Switch
@@ -1942,6 +1985,15 @@ public class Manejo implements Datos.Iface {
                 String valorHora=hourdateFormat.format(date2);
                 
                 Asignacion(varFechaHora,valorHora);
+            break;
+            
+            case 67://Contar
+                String seleccion=Ejecuccion((SimpleNode) raiz.children[0]);
+                
+                String[] contable=seleccion.split("#");
+                
+                Respuesta=String.valueOf(contable.length);
+                
             break;
             
             case 69://Logica 
