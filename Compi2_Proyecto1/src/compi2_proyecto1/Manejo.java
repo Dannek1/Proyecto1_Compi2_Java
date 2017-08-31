@@ -41,6 +41,7 @@ public class Manejo implements Datos.Iface {
     String AMBITO="Global";
     int hacer=0;
     boolean Ejecutar=true;
+    boolean Detener=false;
     
     Anlisis_XML LeerXML=new Anlisis_XML();
     Analisis_Paquete LeerPaquete=new Analisis_Paquete();
@@ -1512,7 +1513,10 @@ public class Manejo implements Datos.Iface {
                 
             break;
             
-            
+            case 22://Retorno
+                Respuesta = Ejecuccion((SimpleNode) raiz.children[0]) ;
+                
+            break;
             
             case 23://Crear Usuario
                 if(Ejecutar){
@@ -1819,10 +1823,106 @@ public class Manejo implements Datos.Iface {
                 
             break;
             
-            case 61:
-            
+            case 59://Setencias Switch
+                if (Ejecutar) {
+                    if (((SimpleNode) raiz.children[0]).name.equals("DETENER")) {
+                        Respuesta = "Detener";
+                    } else if (raiz.children.length == 2) {
+                        Ejecuccion((SimpleNode) raiz.children[0]);
+                        Respuesta = Ejecuccion((SimpleNode) raiz.children[1]);
+                    } else {
+                        Respuesta = Ejecuccion((SimpleNode) raiz.children[0]);
+                    }
+                } else {
+                    if (((SimpleNode) raiz.children[0]).name.equals("DETENER")) {
+                        Respuesta = "Detener;";
+                    } else if (raiz.children.length == 2) {
+                        Respuesta = Ejecuccion((SimpleNode) raiz.children[0])+" "+Ejecuccion((SimpleNode) raiz.children[1]);;
+                    } else {
+                        Respuesta = Ejecuccion((SimpleNode) raiz.children[0]);
+                    }
+                }
+                
             break;
             
+            case 61://FOR
+                if(Ejecutar){
+                    String Ambtiotemp=AMBITO;
+                AMBITO="for";
+                
+                String varFor=Ejecuccion((SimpleNode) raiz.children[0]); 
+                String logicaFor=Ejecuccion((SimpleNode) raiz.children[2]); 
+                String operadorF=Ejecuccion((SimpleNode) raiz.children[4]);
+                
+                while(logicaFor.equals("true") && Detener==false){
+                    String r=Ejecuccion((SimpleNode) raiz.children[5]);
+                    
+                    if(r.equals("Detener")){
+                        Detener=true;
+                    }else if(operadorF.equals("++")){
+                        Variable temp=variables.Buscar(varFor);
+                        int temporal=Integer.parseInt(temp.getValor())+1;
+                        Asignacion(varFor,String.valueOf(temporal));
+                        
+                    }else if(operadorF.equals("--")){
+                        Variable temp=variables.Buscar(varFor);
+                        int temporal=Integer.parseInt(temp.getValor())-1;
+                        Asignacion(varFor,String.valueOf(temporal));
+                    }
+                    logicaFor=Ejecuccion((SimpleNode) raiz.children[2]); 
+                }
+                
+                Detener=false;
+                variables.Eliminar(varFor, AMBITO);
+                
+                AMBITO=Ambtiotemp;
+                
+                }else{
+                    Respuesta="Para ("+Ejecuccion((SimpleNode) raiz.children[0])+";"+Ejecuccion((SimpleNode) raiz.children[2])+";"+Ejecuccion((SimpleNode) raiz.children[4])+"){"+Ejecuccion((SimpleNode) raiz.children[5])+"}";
+                }
+
+            break;
+            
+            case 62://Declaracion For
+                if (Ejecutar) {
+                    String idF = ((SimpleNode) raiz.children[0]).name;
+                    String tipoF = "INTEGER";
+
+                    String Valor = Ejecuccion((SimpleNode) raiz.children[1]);
+                    Declarar(idF, AMBITO, Valor, tipoF);
+
+                    Respuesta = idF;
+                }else{
+                    Respuesta="Declarar "+((SimpleNode) raiz.children[0]).name+" INTEGER ="+Ejecuccion((SimpleNode) raiz.children[1]);
+                }
+                
+                
+                
+            break;
+            
+            case 63://Operador FOr
+                Respuesta=((SimpleNode) raiz.children[0]).name;
+            break;    
+            
+            case 64://WHILE
+                if(Ejecutar){
+                    String logicaWhile=Ejecuccion((SimpleNode) raiz.children[0]); 
+                
+                while(logicaWhile.equals("true") && Detener==false){
+                    String r=Ejecuccion((SimpleNode) raiz.children[1]);
+                    
+                    if(r.equals("Detener")){
+                        Detener=true;
+                    }
+                }
+                }else{
+                   Respuesta="Mientras ("+Ejecuccion((SimpleNode) raiz.children[0])+"){"+Ejecuccion((SimpleNode) raiz.children[1])+"}";
+                }
+                
+                
+                
+            break;
+                
             case 69://Logica 
              
                 Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
@@ -2100,10 +2200,7 @@ public class Manejo implements Datos.Iface {
                 }
                 break;
                 
-            case 22://Retorno
-                Respuesta = Ejecuccion((SimpleNode) raiz.children[0]) ;
-                
-            break;
+            
             
             case 105://logica consultas
                 if (raiz.children.length >3)   {
@@ -2326,15 +2423,7 @@ public class Manejo implements Datos.Iface {
                 //op1 booleanno
                 if (op1.equals("true") || op1.equals("false") || op1.equals("1") || op1.equals("0")) {
                     //op2 booleano
-                    if (op2.equals("true") || op2.equals("false") || op2.equals("1") || op2.equals("0")) {
-                        Respuesta = "";
-                        System.out.println("ERROR TIPOS INCOMPATIBLES");
-                        //op2 String    
-                    } else if (op2.charAt(0) == '\"') {
-                        System.out.println("ERROR TIPOS INCOMPATIBLES");
-
-                        //op2 Int
-                    } else if (isNumeric(op2)) {
+                     if (isNumeric(op2)) {
                         int r = 0;
                         if (op1.equals("true") || op1.equals("1")) {
                             r = 1 - Integer.parseInt(op2);
@@ -2354,6 +2443,14 @@ public class Manejo implements Datos.Iface {
                         Respuesta = String.valueOf(r);
 
                         //op2 DAte     
+                    } else if (op2.equals("true") || op2.equals("false") || op2.equals("1") || op2.equals("0")) {
+                        Respuesta = "";
+                        System.out.println("ERROR TIPOS INCOMPATIBLES");
+                        //op2 String    
+                    } else if (op2.charAt(0) == '\"') {
+                        System.out.println("ERROR TIPOS INCOMPATIBLES");
+
+                        //op2 Int
                     } else {
                         Respuesta = "";
                         System.out.println("ERROR TIPOS INCOMPATIBLES");

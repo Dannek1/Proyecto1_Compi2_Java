@@ -118,7 +118,10 @@ public interface AnalizadorTreeConstants
   public int JJTCOMPLETO = 112;
   public int JJTTABLA = 113;
   public int JJTUSUARIO = 114;
-  public int JJTERROR_SKIPTO = 115;
+  public int JJTINCR = 115;
+  public int JJTDECR = 116;
+  public int JJTDETENER = 117;
+  public int JJTERROR_SKIPTO = 118;
 
 
   public String[] jjtNodeName = {
@@ -237,7 +240,10 @@ public interface AnalizadorTreeConstants
     "COMPLETO",
     "TABLA",
     "USUARIO",
+    "INCR",
+    "DECR",
+    "DETENER",
     "error_skipto",
   };
 }
-/* JavaCC - OriginalChecksum=10770bcb83b550eddddd4f0ebf13341a (do not edit this line) */
+/* JavaCC - OriginalChecksum=39ed551bec8805263e749985efaad3bb (do not edit this line) */

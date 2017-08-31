@@ -602,7 +602,7 @@ void IF():
 void sino_else():
 {}
 {
-	 <R_SINO><COR_IZ>(SubSentencia())+<COR_Der>
+	 <R_SINO><COR_IZ>SubSentencias()<COR_Der>
          
 
 }
@@ -630,8 +630,8 @@ void caso():
 void Sentencias_swithc():
 {}
 {
-	(SubSentencia())+
-	|<R_DETENER>
+	 SubSentencia()(Sentencias_swithc())?
+	|r_detener() r_punto_coma()
 }
 
 void defecto():
@@ -657,8 +657,8 @@ void declaracion_for():
 void operador_for():
 {}
 {
-	 <INCR>
-	|<DECR>
+	 r_incr()
+	|r_decr()
 }
 
 void While():
@@ -1098,6 +1098,31 @@ void r_usario()#USUARIO:
 {
 	t=<R_USUARIO>{jjtThis.setName(t.image);}
 }
+
+void r_incr()#INCR:
+{
+	Token t;
+}
+{
+	t=<INCR>{jjtThis.setName(t.image);}
+}
+
+void r_decr()#DECR:
+{
+	Token t;
+}
+{
+	t=<DECR>{jjtThis.setName(t.image);}
+}
+
+void r_detener()#DETENER:
+{
+	Token t;
+}
+{
+	t=<R_DETENER>{jjtThis.setName(t.image);}
+}
+
 
 JAVACODE 
 void error_skipto(int kind) { 
