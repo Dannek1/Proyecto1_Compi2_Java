@@ -21,7 +21,7 @@ public class Analisis_Paquete {
         String Respuesta="";
         
         InputStream is=new ByteArrayInputStream(path.getBytes());
-        Analizador_Paquetes a=new Analizador_Paquetes(is,"UTF-8");
+        Analizador_Paquetes a=new Analizador_Paquetes(is);
         try{
         SimpleNode raiz =a.Programa();
 

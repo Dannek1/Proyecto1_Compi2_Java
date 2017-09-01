@@ -58,7 +58,8 @@ public class Manejo implements Datos.Iface {
         String Respuesta="";
         String instruciones=LeerPaquete.Responder(cadena);
         String[] sentencias=instruciones.split("#");
-        InputStream is=new ByteArrayInputStream(sentencias[1].getBytes());
+        if(!instruciones.equals("ERROR")){
+            InputStream is=new ByteArrayInputStream(sentencias[1].getBytes());
         Analizador a=new Analizador(is,"UTF-8");
         
         
@@ -117,9 +118,15 @@ public class Manejo implements Datos.Iface {
         
         }catch(ParseException e){
             System.out.println(e.getMessage());
+            Respuesta="ERRO en paquete";
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Manejo.class.getName()).log(Level.SEVERE, null, ex);
+            Respuesta="ERRO en paquete";
         }
+        }else{
+           Respuesta="ERRO en paquete"; 
+        }
+        
         return Respuesta;
     }
     
