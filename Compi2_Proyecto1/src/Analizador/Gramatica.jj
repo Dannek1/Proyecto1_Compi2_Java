@@ -1206,7 +1206,8 @@ void campo():
 {/*@bgen(jjtree) campo */
         try {
 /*@egen*/
-	r_id()/*@bgen(jjtree)*/
+	r_id()
+	|r_usuario()/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -4025,6 +4026,31 @@ void r_detener()        :
         try {
 /*@egen*/
 	t=<R_DETENER>/*@bgen(jjtree)*/
+                     {
+                       jjtree.closeNodeScope(jjtn000, true);
+                       jjtc000 = false;
+                     }
+/*@egen*/{jjtn000.setName(t.image);}/*@bgen(jjtree)*/
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
+}
+
+void r_usuario()        :
+{/*@bgen(jjtree) USUARIO */
+        SimpleNode jjtn000 = new SimpleNode(JJTUSUARIO);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Token t;
+}
+{/*@bgen(jjtree) USUARIO */
+        try {
+/*@egen*/
+	t=<R_USUARIO>/*@bgen(jjtree)*/
                      {
                        jjtree.closeNodeScope(jjtn000, true);
                        jjtc000 = false;

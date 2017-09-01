@@ -1168,6 +1168,83 @@ public class Manejo implements Datos.Iface {
 
                 }else{
                     
+                    String busqueda="";
+                    for(int x=0;x<items.getLength();x++){
+                       Element element = (Element) items.item(x); 
+                       NodeList elementos=element.getChildNodes();
+                       
+                       for(int y=0;y<elementos.getLength();y++){
+                           Element temp=(Element)elementos.item(y);
+                           
+                           Valores+=temp.getTagName()+","+temp.getTextContent()+";";
+                       }
+                       
+                       Valores+="#";
+                    } 
+                    
+                    Valores=Valores.toLowerCase();
+                    
+                    String[] Registros = Valores.split("#");
+
+                    if (!Condiciones.equals("")) {
+                        String[] Condicion = Condiciones.split("&&");
+
+                        String cond = "";
+
+                        for (int x = 0; x < Condicion.length; x++) {
+                            String[] temp = Condicion[x].split("==");
+                            cond += temp[0] + "," + temp[1] + ";";
+                        }
+                        String[] term = cond.split(";");
+
+                        boolean resultado = false;
+
+                        for (int x = 0; x < Registros.length; x++) {
+
+                            int y = 0;
+
+                            while (y < term.length) {
+                                if (Registros[x].contains(term[y])) {
+                                    resultado = true;
+                                    y++;
+                                } else {
+                                    resultado = false;
+                                    break;
+                                }
+                            }
+
+                            if (resultado) {
+                                busqueda += Registros[x] + "#";
+                            }
+                        }
+                    }else{
+                    busqueda=Valores;    
+                    }
+                    
+                    String[] Campo=Campos.split(",");
+                    
+                    String[] filtro=busqueda.split("#");
+                    
+                    for(int x=0;x<filtro.length;x++){
+                        String[] reg=filtro[x].split(";");
+                        
+                        for(int y=0;y<reg.length;y++){
+                            
+                            for(int z=0;z<Campo.length;z++){
+                                if(reg[y].contains(Campo[z])){
+                                    Respuesta+=reg[y]+";";
+                                    
+                                }
+                            }
+                        }
+                        
+                        Respuesta+="#";
+                        
+                    }
+                    
+                    
+                    
+                    
                 }                           
 
             } catch (Exception e) {

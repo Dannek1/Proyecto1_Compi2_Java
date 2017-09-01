@@ -418,6 +418,7 @@ void campo():
 {}
 {
 	r_id()
+	|r_usuario()
 }
 
 void Valor():
@@ -1121,6 +1122,14 @@ void r_detener()#DETENER:
 }
 {
 	t=<R_DETENER>{jjtThis.setName(t.image);}
+}
+
+void r_usuario()#USUARIO:
+{
+	Token t;
+}
+{
+	t=<R_USUARIO>{jjtThis.setName(t.image);}
 }
 
 
