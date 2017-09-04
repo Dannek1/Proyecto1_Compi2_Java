@@ -109,7 +109,8 @@ public class Manejo implements Datos.Iface {
                     
                 }else{
                     //Prueba comit
-                    Respuesta="[ \"login\":false]";
+                     Respuesta = "[ \n \"validar\": 1500 ,\n \"login\":[\n";
+                    Respuesta += "\"login\":false \n ] \n ]";
                 }
 
             }
@@ -494,7 +495,44 @@ public class Manejo implements Datos.Iface {
     
     void Insertar_Tabla(String Dato,String Tabla,String Base){
         
+        String[] Datos=Dato.split(",");
+         
         String Campo=CamposT_Base(Base,Tabla);
+        
+        Campo=EliminaCaracteres(Campo);
+        
+        String[] Campos=Campo.split(";");
+        int posauto=-1;
+        String posnull="";
+        
+        if(Campos.length!=Datos.length){
+            String auto=Buscar_autoincrementable(Tabla,Base);
+            String nulos=Buscar_Nulo(Tabla,Base);
+            String[] nulo=nulos.split(",");
+            
+            for(int x=0;x<Campos.length;x++){
+                if(auto.equals(Campos[x])){
+                    posauto=x;
+                }
+                
+                for(int y = 0; y < nulo.length; y++) {
+                    if (nulo[y].equals(Campos[x])) {
+                        posnull =x+"," ;
+                    }
+                }
+                
+            }
+            
+            
+            if(posauto!=-1){
+                if(isNumeric(Datos[posauto])){
+                    
+                }
+            }
+            
+            
+        }
+        
         
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -508,10 +546,10 @@ public class Manejo implements Datos.Iface {
             Element Row=doc.createElement("Row");
             element.appendChild(Row);
             
-            Campo=EliminaCaracteres(Campo);
+           
             
-            String[] Campos=Campo.split(";");
-            String[] Datos=Dato.split(",");
+            
+           
             
             Element[] elementos=new Element[Campos.length];
             
@@ -648,6 +686,139 @@ public class Manejo implements Datos.Iface {
             respuesta = false;
         }
         System.out.println(mensaje);
+        return respuesta;
+    }
+    
+    String Buscar_autoincrementable(String Tabla,String Base){
+        String respuesta="";
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document doc = builder.parse(new File("C:/Base_Compi2/BD/" + Base + ".usac"));
+                boolean encontrado=false;
+                
+                NodeList basel = doc.getElementsByTagName("Base");
+                Element base = (Element) basel.item(0);
+                NodeList items = base.getElementsByTagName("Tabla");
+                int x=0;
+                while(x<items.getLength()){
+                    
+                    Element tablaE=(Element) items.item(x);
+                    NodeList items2 = tablaE.getElementsByTagName("nombre");
+                    Element nombre=(Element) items2.item(0);
+                    if (nombre.getTextContent().equals(Tabla)) {
+                        encontrado=true;
+                        break;
+                    }else{
+                        System.out.println("NO Existe la Tabla:"+Tabla+" En la Base de Datos:"+Base);
+                        x++;
+                    }
+                    
+                }
+                
+                if(encontrado){
+                    Element tablaE=(Element) items.item(x);
+                    NodeList items2 = tablaE.getElementsByTagName("rows");
+                    Element row = (Element) items2.item(0);
+                    NodeList campos = row.getChildNodes();
+                    for (int ix = 0; ix < campos.getLength(); ix++) {
+                        Element element = (Element) campos.item(ix);
+                        // elejir un elemento especifico por algun atributo
+                        String atribs=element.getAttribute("Atributos").toString();
+                        String[] atrib=atribs.split(";");
+                        for(int ixx=0;ixx<atrib.length;ixx++){
+                            if(atrib[ixx].equals("Autoincrementable")){
+                                respuesta=element.getTextContent();
+                            }else{
+                                
+                                
+                            }
+                        }
+                        
+                    }
+                    
+                }else{
+                    
+                }
+
+
+            } catch (Exception e) {
+
+            }
+        
+        return respuesta;
+    }
+    
+    int Ultimo_incrementable(String Tabla, String Base, String Campo){
+        int Respuesta =0;
+        
+        
+        return Respuesta;
+    }
+    
+    String Path_tabla(String Tabla,String Base){
+        String Respuesta="";
+        
+        return Respuesta;
+    }
+    
+    String Buscar_Nulo(String Tabla,String Base){
+        String respuesta="";
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document doc = builder.parse(new File("C:/Base_Compi2/BD/" + Base + ".usac"));
+                boolean encontrado=false;
+                
+                NodeList basel = doc.getElementsByTagName("Base");
+                Element base = (Element) basel.item(0);
+                NodeList items = base.getElementsByTagName("Tabla");
+                int x=0;
+                while(x<items.getLength()){
+                    
+                    Element tablaE=(Element) items.item(x);
+                    NodeList items2 = tablaE.getElementsByTagName("nombre");
+                    Element nombre=(Element) items2.item(0);
+                    if (nombre.getTextContent().equals(Tabla)) {
+                        encontrado=true;
+                        break;
+                    }else{
+                        System.out.println("NO Existe la Tabla:"+Tabla+" En la Base de Datos:"+Base);
+                        x++;
+                    }
+                    
+                }
+                
+                if(encontrado){
+                    Element tablaE=(Element) items.item(x);
+                    NodeList items2 = tablaE.getElementsByTagName("rows");
+                    Element row = (Element) items2.item(0);
+                    NodeList campos = row.getChildNodes();
+                    for (int ix = 0; ix < campos.getLength(); ix++) {
+                        Element element = (Element) campos.item(ix);
+                        // elejir un elemento especifico por algun atributo
+                        String atribs=element.getAttribute("Atributos").toString();
+                        String[] atrib=atribs.split(";");
+                        for(int ixx=0;ixx<atrib.length;ixx++){
+                            if(atrib[ixx].equals("Nulo")){
+                                respuesta+=element.getTextContent()+",";
+                            }else{
+                                
+                                
+                            }
+                        }
+                        
+                    }
+                    
+                }else{
+                    
+                }
+
+
+            } catch (Exception e) {
+
+            }
+        
         return respuesta;
     }
     
@@ -1609,11 +1780,11 @@ public class Manejo implements Datos.Iface {
             
             case 23://Crear Usuario
                 if(Ejecutar){
-                   String base_temp=BASE_USO;
+                String base_temp=BASE_USO;
                 BASE_USO="UsuariosBD";
                 String usuario=((SimpleNode) raiz.children[0]).name;
                 String pass=Ejecuccion((SimpleNode) raiz.children[1]) ;
-
+                Insertar_Tabla("\""+usuario+"\",\""+usuario+"\","+pass+"\"","Tabla_Usuarios",BASE_USO);
                 BASE_USO=base_temp; 
                 }else{
                    Respuesta="USUARIO "+((SimpleNode) raiz.children[0]).name+" COLOCAR password ="+Ejecuccion((SimpleNode) raiz.children[1]); 
@@ -1656,7 +1827,7 @@ public class Manejo implements Datos.Iface {
                         } else {
                         String Campos=Ejecuccion((SimpleNode) raiz.children[0]);
                         String Valores=Ejecuccion((SimpleNode) raiz.children[1]);   
-                         System.out.println("Control");
+                        System.out.println("Control");
                         
                         }
                         
@@ -1669,7 +1840,9 @@ public class Manejo implements Datos.Iface {
                         System.out.println("No Hay ninguna Base en Uso");
                         } else {
                             String Valores=Ejecuccion((SimpleNode) raiz.children[0]);
+                            Insertar_Tabla(Valores,TABLA_aux,BASE_USO);
                         }
+                        TABLA_aux="";
                     }else{
                         Respuesta=Ejecuccion((SimpleNode) raiz.children[0])+");";
                     }
@@ -1817,7 +1990,7 @@ public class Manejo implements Datos.Iface {
                 String Archivo_rest=((SimpleNode) raiz.children[1]).name;
             break;
             
-            case 43:
+            case 43://alterar
                 Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
             break;
             
