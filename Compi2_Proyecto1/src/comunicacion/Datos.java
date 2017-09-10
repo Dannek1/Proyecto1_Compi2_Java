@@ -174,7 +174,7 @@ public class Datos {
 
       public Paquete_result getResult(I iface, Paquete_args args) throws org.apache.thrift.TException {
         Paquete_result result = new Paquete_result();
-        result.success = iface.Paquete(args.cadena);
+            result.success = iface.Paquete(args.cadena);
         return result;
       }
     }

@@ -618,8 +618,7 @@ void Switch():
 void casos():
 {}
 {
-	 LOOKAHEAD(5)caso()casos()
-	|LOOKAHEAD(5)caso()
+	 caso()(casos())?
 }
 
 void caso():
@@ -700,7 +699,7 @@ void Tipo_Dato()#TIPO_DATO:
 	|t=<R_DOUBLE>{jjtThis.setName(t.image);}
 	|t=<R_BOOL>{jjtThis.setName(t.image);}
 	|t=<R_DATE>{jjtThis.setName(t.image);}
-	|t=<	>{jjtThis.setName(t.image);}
+	|t=<R_DATETIME>{jjtThis.setName(t.image);}
 	
 }
 

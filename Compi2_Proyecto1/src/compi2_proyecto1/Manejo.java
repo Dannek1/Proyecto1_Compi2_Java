@@ -42,11 +42,13 @@ public class Manejo implements Datos.Iface {
     String CAMPOS_aux="";
     String VALORES_aux="";
     String AMBITO="Global";
+    String USER_ACTUAL="";
     int hacer=0;
     boolean Ejecutar=true;
     boolean Ejecutar_Swithc=false;
     boolean Detener=false;
     String EXP_SWITCH="";
+    String Historial="";
     
     Anlisis_XML LeerXML=new Anlisis_XML();
     Analisis_Paquete LeerPaquete=new Analisis_Paquete();
@@ -58,75 +60,97 @@ public class Manejo implements Datos.Iface {
         String Respuesta="";
         String instruciones=LeerPaquete.Responder(cadena);
         String[] sentencias=instruciones.split("#");
-        if(!instruciones.equals("ERROR")){
-            InputStream is=new ByteArrayInputStream(sentencias[1].getBytes());
-        Analizador a=new Analizador(is,"UTF-8");
         
-        
-        try{
-        SimpleNode raiz =a.Programa();
-        
-        
-        
-        Handler h=new Handler();
-        h.agregarNumero(raiz);
-        h.iniciarGrafica(raiz);
-        h.GenerarImagen();
-        System.out.println("Pruba");
-        
-        
-        
-            if (sentencias[0].equals("login")) {
-                Lectura = Ejecuccion(raiz);
+        if (sentencias[0].equals("\"fin\"")) {
+                USER_ACTUAL = "";
+                BASE_USO = "";
+                
+        } else if (!instruciones.equals("ERROR")) {
+            InputStream is = new ByteArrayInputStream(sentencias[1].getBytes());
+            Date f_historial=new Date();
+            DateFormat hourdateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss ");
+            Historial +=hourdateFormat.format(f_historial)+";"+sentencias[1]+";";
+            Analizador a = new Analizador(is, "UTF-8");
 
-                if (!Lectura.equals("")) {
-                    Lectura = Lectura.substring(0, Lectura.length() - 1);
+            try {
+                SimpleNode raiz = a.Programa();
 
-                    Respuesta = "[ \n \"validar\": 1500 ,\n \"login\":[\n";
+                Handler h = new Handler();
+                h.agregarNumero(raiz);
+                h.iniciarGrafica(raiz);
+                h.GenerarImagen();
+                System.out.println("Pruba");
 
-                    String[] Resultados = Lectura.split(";");
+                if (sentencias[0].equals("login")) {
+                    Lectura = Ejecuccion(raiz);
 
-                    int x = 0;
+                    if (!Lectura.equals("")) {
+                        Lectura = Lectura.substring(0, Lectura.length() - 1);
 
-                    while (x < Resultados.length) {
+                        Respuesta = "[ \n \"validar\": 1500 ,\n \"login\":[\n";
 
-                        if (Resultados[x].contains("usuario")) {
-                            String[] temp = Resultados[x].split(",");
+                        String[] Resultados = Lectura.split(";");
 
-                            Respuesta += "\"usuario\":\"" + temp[1] + "\",\n";
+                        int x = 0;
+
+                        while (x < Resultados.length) {
+
+                            if (Resultados[x].contains("usuario")) {
+                                String[] temp = Resultados[x].split(",");
+
+                                Respuesta += "\"usuario\":\"" + temp[1] + "\",\n";
+                                USER_ACTUAL = temp[1];
+                            }
+
+                            if (Resultados[x].contains("nombre")) {
+                                String[] temp = Resultados[x].split(",");
+
+                                Respuesta += "\"nombre\":\"" + temp[1] + "\",\n";
+                            }
+                            x++;
+
                         }
 
-                        if (Resultados[x].contains("nombre")) {
-                            String[] temp = Resultados[x].split(",");
+                        Respuesta += "\"login\":true \n ] \n ]";
 
-                            Respuesta += "\"nombre\":\"" + temp[1] + "\",\n";
-                        }
-                        x++;
-
+                    } else {
+                        //Prueba comit
+                        Respuesta = "[ \n \"validar\": 1500 ,\n \"login\":[\n";
+                        Respuesta += "\"login\":false \n ] \n ]";
                     }
 
-                    Respuesta += "\"login\":true \n ] \n ]";
-                    
-                }else{
-                    //Prueba comit
-                     Respuesta = "[ \n \"validar\": 1500 ,\n \"login\":[\n";
-                    Respuesta += "\"login\":false \n ] \n ]";
+                }else if(sentencias[0].equals("usql")) {
+                    Lectura = Ejecuccion(raiz); 
+                    if (!Lectura.equals("")) {
+                        
+                        try{
+                           String[] leer=Lectura.split("@");
+                           if(leer[0].equals("CREAR")){
+                            Historial+=leer[1]+";n";    
+                            Respuesta ="[\n \"paquete\" : \"usql\",\"mensaje\" : \""+leer[1]+"\" \n]";
+                            }     
+                        }catch(Exception x){
+                            
+                        }
+                            
+                        
+                    }else{
+                        Respuesta ="[\n \"paquete\" : \"usql\",]";
+                    }
+                        
                 }
-
+            } catch (ParseException e) {
+                System.out.println(e.getMessage());
+                Respuesta = "ERRO en paquete";
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(Manejo.class.getName()).log(Level.SEVERE, null, ex);
+                Respuesta = "ERRO en paquete";
             }
-        
-        
-        
-        }catch(ParseException e){
-            System.out.println(e.getMessage());
-            Respuesta="ERRO en paquete";
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Manejo.class.getName()).log(Level.SEVERE, null, ex);
-            Respuesta="ERRO en paquete";
+        } else {
+            Respuesta = "ERRO en paquete";
         }
-        }else{
-           Respuesta="ERRO en paquete"; 
-        }
+        
+        
         
         return Respuesta;
     }
@@ -252,7 +276,8 @@ public class Manejo implements Datos.Iface {
         
     }
     
-    void CrearBase(String Nombre) {
+    String CrearBase(String Nombre) {
+        String Respuesta ="";
         if (Existe("C:\\Base_Compi2\\BD\\" + Nombre + ".usac") == false) {
             
             
@@ -284,16 +309,19 @@ public class Manejo implements Datos.Iface {
                 CrearProArch(Nombre+"_PRO");
                 CrearObjetoArch(Nombre+"_OBJ");
                 BASE_USO="";
+                Respuesta="Base de Datos: "+Nombre+" creada";
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }else{
             System.out.println("Ya Esiste la Base de Datos:"+Nombre);
+            Respuesta="Ya Esiste la Base de Datos:"+Nombre;
         }
-
+        return Respuesta;
     }    
     
-    void CrearTabla(String Nombre){
+    String CrearTabla(String Nombre){
+        String Respuesta="";
         if (Existe("C:\\Base_Compi2\\BD\\" + Nombre + ".usac") == false) {
             try {
                 DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -324,14 +352,17 @@ public class Manejo implements Datos.Iface {
                 Result result = new StreamResult(pw);
 
                 transformer.transform(fuente, result);
-
+                
+                Respuesta="Se ha creado la Tabla:" + Nombre+ " En la Base:"+BASE_USO;
+                
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
             System.out.println("Ya Esiste Un Archivo con el Nombre de:" + Nombre);
+            Respuesta="Ya Esiste Un Archivo con el Nombre de:" + Nombre;
         }
-       
+       return Respuesta;
     }
     
     void InsetarBase_Maestro(String Base) throws FileNotFoundException{
@@ -1458,7 +1489,9 @@ public class Manejo implements Datos.Iface {
         switch (temp.getTipo()){
             
             case "TEXT":
-                if(Valor.charAt(0)=='\"'){
+                if(Valor.equals("")){
+                    temp.setValor(Valor);
+                }else if(Valor.charAt(0)=='\"' ){
                     temp.setValor(Valor);
                 }else{
                     System.out.println("Error: Tipos Incompatibles");
@@ -1513,6 +1546,67 @@ public class Manejo implements Datos.Iface {
         
     }
     
+    boolean Existefuncion(String funcion, String Base){
+        boolean respuesta=false;
+        if (Existe("C:\\Base_Compi2\\BD\\" + Base + "_PRO.usac")) {
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document doc = builder.parse(new File("C:/Base_Compi2/BD/" + Base + "_PRO.usac"));
+
+                NodeList items = doc.getElementsByTagName("proc");
+
+                int ix = 0;
+                while (ix < items.getLength()) {
+                    Element element = (Element) items.item(ix);
+                    NodeList subitem = element.getElementsByTagName("nombre");
+                    Element element2 = (Element) subitem.item(0);
+
+                    if (element2.getTextContent().equals("\"" + funcion + "\"")) {
+                        respuesta = true;
+                        break;
+                    }
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            respuesta = false;
+        }  
+        
+        return respuesta;
+    }
+    
+    String Ejecutar_Proc(String funcion, String Base){
+        String Respuesta="";
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document doc = builder.parse(new File("C:/Base_Compi2/BD/" + Base + "_PRO.usac"));
+
+                NodeList items = doc.getElementsByTagName("proc");
+
+                int ix = 0;
+                while (ix < items.getLength()) {
+                    Element element = (Element) items.item(ix);
+                    NodeList subitem = element.getElementsByTagName("nombre");
+                    Element element2 = (Element) subitem.item(0);
+
+                    if (element2.getTextContent().equals("\"" + funcion + "\"")) {
+                        NodeList sentencias = element.getElementsByTagName("src");
+                        Respuesta = sentencias.item(0).getTextContent();
+                        
+                    }
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        
+        return Respuesta;
+    }
+    
     boolean Es_Variable(String Nombre, String Ambito){
         boolean Respuesta=false;
         
@@ -1561,20 +1655,21 @@ public class Manejo implements Datos.Iface {
                Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
                 break;
                 
-            case 4://USAR
+            case 4://USAR   
                 String mensaje = "";
                 if (Ejecutar) {
                     System.out.println(((SimpleNode) raiz.children[0]).name);
                     if (Existe("C:\\Base_Compi2\\BD\\" + ((SimpleNode) raiz.children[1]).name + ".usac")) {
                         BASE_USO = ((SimpleNode) raiz.children[1]).name;
                         System.out.println("Se Utilizará La Base de Datos:" + ((SimpleNode) raiz.children[1]).name);
+                        mensaje = "Se Utilizará La Base de Datos:" + ((SimpleNode) raiz.children[1]).name;
                         
                     } else {
                         System.out.println("La Base de Datos:" + ((SimpleNode) raiz.children[1]).name + " No Existe");
-                        mensaje = "";
+                        mensaje = "La Base de Datos:" + ((SimpleNode) raiz.children[1]).name + " No Existe";
                     }
                 } else {
-                   mensaje = "USAR " + ((SimpleNode) raiz.children[1]).name;     
+                   mensaje = "USAR $" + ((SimpleNode) raiz.children[1]).name;     
                 }
 
                 Respuesta = mensaje;
@@ -1582,7 +1677,7 @@ public class Manejo implements Datos.Iface {
                 
             case 7://Crear
                 System.out.println(((SimpleNode) raiz.children[0]).name);
-                Respuesta="CREAR "+ Ejecuccion((SimpleNode) raiz.children[1]);
+                Respuesta="CREAR@ "+ Ejecuccion((SimpleNode) raiz.children[1]);
                 break;   
                 
             case 8://Opciones Crear
@@ -1592,7 +1687,8 @@ public class Manejo implements Datos.Iface {
             case 9://Crear Base
                 System.out.println(((SimpleNode) raiz.children[0]).name);
                 if(Ejecutar){
-                    CrearBase(((SimpleNode) raiz.children[0]).name);
+                    Respuesta=CrearBase(((SimpleNode) raiz.children[0]).name);
+
                 }else{
                     Respuesta="BASE_DATOS "+((SimpleNode) raiz.children[0]).name+"\n";
                 }
@@ -1607,11 +1703,11 @@ public class Manejo implements Datos.Iface {
                     } else {
                         System.out.println(((SimpleNode) raiz.children[0]).name);
                         String nombreTabla = ((SimpleNode) raiz.children[0]).name;
-                        CrearTabla(nombreTabla);
+                        Respuesta = CrearTabla(nombreTabla);
                         String Campos = Ejecuccion((SimpleNode) raiz.children[1]);
                         InsertarTabla_Base(nombreTabla, Campos, BASE_USO);
                     }
-                    Respuesta = "EXITO";
+                    
                 }else{
                     Respuesta="TABLA "+((SimpleNode) raiz.children[0]).name+"("+Ejecuccion((SimpleNode) raiz.children[1])+");\n";
                 }
@@ -2084,11 +2180,11 @@ public class Manejo implements Datos.Iface {
             case 56://Switch
                 
                 EXP_SWITCH=Ejecuccion((SimpleNode) raiz.children[0]);
-                
+                AMBITO="swith";
                 String r2=Ejecuccion((SimpleNode) raiz.children[1]);
                 
                 if(raiz.children.length==3){
-                    if(Detener==false){
+                    if(Detener==false){                      
                         Ejecuccion((SimpleNode) raiz.children[2]);
                     }
                     
@@ -2118,8 +2214,10 @@ public class Manejo implements Datos.Iface {
                 if(temp1.getValor().equals(caso) ||Ejecutar_Swithc){
                     Ejecutar_Swithc=true;
                     String c=Ejecuccion((SimpleNode) raiz.children[1]);
-                    
-                    if(c.equals(Detener)){
+                    int asig=Integer.parseInt(temp1.getValor());
+                    asig++;
+                    Asignacion(EXP_SWITCH,String.valueOf(asig));
+                    if(c.equals("Detener")){
                         Detener=true;
                     }
                 }
@@ -2128,14 +2226,22 @@ public class Manejo implements Datos.Iface {
             
             case 59://Setencias Switch
                 if (Ejecutar) {
-                    if (((SimpleNode) raiz.children[0]).name.equals("DETENER")) {
-                        Respuesta = "Detener";
-                    } else if (raiz.children.length == 2) {
-                        Ejecuccion((SimpleNode) raiz.children[0]);
-                        Respuesta = Ejecuccion((SimpleNode) raiz.children[1]);
-                    } else {
-                        Respuesta = Ejecuccion((SimpleNode) raiz.children[0]);
+                    
+                    try {
+                        if (((SimpleNode) raiz.children[0]).name.equals("DETENER")) {
+                            Respuesta = "Detener";
+                        }
+                    } catch (Exception ex) {
+                        if (raiz.children.length == 2) {
+                            Ejecuccion((SimpleNode) raiz.children[0]);
+                            Respuesta = Ejecuccion((SimpleNode) raiz.children[1]);
+                        } else {
+                            Respuesta = Ejecuccion((SimpleNode) raiz.children[0]);
+                        }
                     }
+   
+                    
+                     
                 } else {
                     if (((SimpleNode) raiz.children[0]).name.equals("DETENER")) {
                         Respuesta = "Detener;";
@@ -2147,6 +2253,11 @@ public class Manejo implements Datos.Iface {
                 }
                 
             break;
+            
+            case 60://Defecto
+                Respuesta = Ejecuccion((SimpleNode) raiz.children[0]);
+            break;
+            
             
             case 61://FOR
                 if(Ejecutar){
@@ -2517,6 +2628,24 @@ public class Manejo implements Datos.Iface {
                 Respuesta=((SimpleNode) raiz.children[0]).name;
             break;
             
+            case 87://Procedimiento exec
+                if (!BASE_USO.equals("")) {
+                    String Proc_name=((SimpleNode) raiz.children[0]).name;
+                    
+                    if(Existefuncion(Proc_name,BASE_USO)){
+                        String instrucciones=Ejecutar_Proc(Proc_name,BASE_USO);
+                         InputStream is = new ByteArrayInputStream(instrucciones.getBytes());
+                        //Respuesta
+                    }else{
+                        Respuesta="No Existe el Procedimiento:"+Proc_name+" en la base:"+BASE_USO;
+                    }
+                    
+                }else{
+                    Respuesta="No hay ninguna base en uso";
+                }
+                    
+            break;
+                
             case 88://SubSentencia
                 if (raiz.children.length > 1) {
                     Respuesta = Ejecuccion((SimpleNode) raiz.children[0]) ;

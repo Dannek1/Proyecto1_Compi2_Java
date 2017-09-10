@@ -79,7 +79,7 @@ public class Analisis_Paquete {
             break;
             
             case 11://
-                Respuesta=((SimpleNode)raiz.children[0]).name;
+                Respuesta=((SimpleNode)raiz.children[0]).name+"#algo";
             break;
             
             default:

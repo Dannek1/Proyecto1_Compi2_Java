@@ -2147,8 +2147,7 @@ void casos():
 {/*@bgen(jjtree) casos */
          try {
 /*@egen*/
-	 LOOKAHEAD(5)caso()casos()
-	|LOOKAHEAD(5)caso()/*@bgen(jjtree)*/
+	 caso()(casos())?/*@bgen(jjtree)*/
          } catch (Throwable jjte000) {
            if (jjtc000) {
              jjtree.clearNodeScope(jjtn000);
