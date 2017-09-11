@@ -1304,6 +1304,52 @@ public class Manejo implements Datos.Iface {
         }
     }
     
+    void QuitarCampo_Objeto(String archivo, String dato, String Objeto){
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new File("C:/Base_Compi2/BD/" + archivo + ".usac"));
+            Element elementoTabla;
+
+            NodeList items = doc.getElementsByTagName("Obj");
+            int ix = 0;
+            while (ix < items.getLength()) {
+                Element element = (Element) items.item(ix);
+                NodeList subitem = element.getElementsByTagName("nombre");
+                Element element2 = (Element) subitem.item(0);
+
+                if (element2.getTextContent().equals("\""+Objeto+"\"")) {
+                    NodeList subitem2 = element.getElementsByTagName("attr");
+                    elementoTabla = (Element) subitem2.item(0);
+                    NodeList parametros=elementoTabla.getChildNodes();
+                    
+                    for(int x=0;x<parametros.getLength();x++){
+                        Node parametro=parametros.item(x);
+                        
+                        if(parametro.getTextContent().equals("\""+dato+"\""))                        {
+                            parametro.getParentNode().removeChild(parametro);
+                            break;
+                        }
+                    }
+                    ix = items.getLength();
+                } else {
+                    ix++;
+                }
+
+            }
+            
+          Transformer transformer = TransformerFactory.newInstance().newTransformer();
+          Result output = new StreamResult(new File("C:/Base_Compi2/BD/" + archivo + ".usac"));
+          Source input = new DOMSource(doc);
+          transformer.transform(input, output);  
+            
+            
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
     String Selecionar(String Campos, String Tabla,String Condiciones,String Orden){
         String Respuesta="";
         
@@ -1639,7 +1685,7 @@ public class Manejo implements Datos.Iface {
         String[] campo=campos.split(",");
         String[] dato=Datos.split(",");
         
-            try {
+        try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(new File("C:/Base_Compi2/BD/" + Tabla + ".usac"));
@@ -1851,6 +1897,100 @@ public class Manejo implements Datos.Iface {
             
         }
         return Respuesta;
+    }
+    
+    String CambiarContra(String user,String contra){
+        String respuesta="";
+        contra=EliminaCaracteres(contra);
+        boolean cambiar=false;
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new File("C:/Base_Compi2/BD/Tabla_Usuarios.usac"));
+
+            NodeList items = doc.getElementsByTagName("Tabla");
+            Element element = (Element) items.item(0);
+            
+            NodeList filas = element.getElementsByTagName("Row");
+            
+                for (int x = 0; x < filas.getLength(); x++) {
+                    Element elemento = (Element) filas.item(x);
+                    NodeList elementos = elemento.getChildNodes();
+
+                    for (int z = 0; z < elementos.getLength(); z++) {
+                        Node temp = elementos.item(z);
+                        
+                        if(temp.getNodeName().equals("Usuario")){
+                            if(temp.getTextContent().equals(user)){
+                                cambiar=true;
+                            }
+                        }else if(temp.getNodeName().equals("password")){
+                            if(cambiar){
+                                temp.setTextContent(contra);
+                                break;
+                                
+                            }
+                        }
+
+                    }
+                    
+                    if(cambiar) break;
+
+                }
+            
+                 
+
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Result output = new StreamResult(new File("C:/Base_Compi2/BD/Tabla_Usuarios.usac"));
+            Source input = new DOMSource(doc);
+            transformer.transform(input, output);
+            
+          
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return respuesta;
+    }
+    
+    String AlterarObjeto(String ob,String Accion,String campos){
+        String respuesta="";
+        switch (Accion){
+            case "AGREGAR":
+                if (!campos.equals("Default")) {
+               String campo[] = campos.split(",");
+
+               int x;
+
+               for (x = 0; x < campo.length; x++) {
+                   String[] dato = campo[x].split(" ");
+
+                   AñadirCampo_Objeto(BASE_USO+"_OBJ", dato, ob);
+
+               }
+           }
+                
+
+        
+            break;
+            
+            case "QUITAR":
+                if (!campos.equals("Default")) {
+               String campo[] = campos.split(",");
+
+               int x;
+
+               for (x = 0; x < campo.length; x++) {
+
+                   QuitarCampo_Objeto(BASE_USO+"_OBJ", campo[x], ob);
+
+               }
+           }
+            break;    
+        }
+        
+        return respuesta;
     }
     
     public String Ejecuccion(SimpleNode raiz) throws FileNotFoundException{
@@ -2322,7 +2462,48 @@ public class Manejo implements Datos.Iface {
             break;
             
             case 44://alterado
-                String alterado=((SimpleNode) raiz.children[0]).name;
+                String alterado = ((SimpleNode) raiz.children[0]).name;
+
+                switch (alterado) {
+                    case "TABLA":
+                        String Tablamod=((SimpleNode) raiz.children[1]).name;
+                        String actCamT=Ejecuccion((SimpleNode) raiz.children[2]);
+                        String[] infoAlt=actCamT.split("#");
+                        
+                        
+                        System.out.println("Prueba");
+                        break;
+                    case "OBJETO":
+                        String Objetomod=((SimpleNode) raiz.children[1]).name;
+                        String actCamO=Ejecuccion((SimpleNode) raiz.children[2]);
+                        System.out.println("Prueba");
+                        String[] infoOb=actCamO.split("#");
+                        
+                        AlterarObjeto(Objetomod,infoOb[0],infoOb[1]);
+                                                
+                        break;
+                    case "USUARIO":
+                        String usermod=((SimpleNode) raiz.children[1]).name;
+                        String nuevopass=Ejecuccion((SimpleNode) raiz.children[2]);
+                        CambiarContra(usermod,nuevopass);
+                        break;
+                }
+
+            break;
+            
+            case 45://Alterado Tabla
+                String Accion= ((SimpleNode) raiz.children[0]).name;
+                String Campos=Ejecuccion((SimpleNode) raiz.children[1]);
+                
+                Respuesta=Accion +"#"+Campos;
+                
+            break;
+            
+            case 46://Alterado Objeto
+                String Accionob= ((SimpleNode) raiz.children[0]).name;
+                String Camposob=Ejecuccion((SimpleNode) raiz.children[1]);
+                
+                Respuesta=Accionob +"#"+Camposob;
                 
             break;
             
