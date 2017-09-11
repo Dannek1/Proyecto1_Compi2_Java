@@ -552,10 +552,10 @@ void Eliminar():
 void objetos_eliminar():
 {}
 {
-	 <R_TABLA>
-	|<R_BASE>
-	|<R_OBJETO>
-	|<R_USUARIO>
+	 r_tabla()
+	|r_base()
+	|r_objeto()
+	|r_usario()
 }
 
 void Declarar():
@@ -618,7 +618,7 @@ void Switch():
 void casos():
 {}
 {
-	 caso()(casos())?
+		caso()(casos())?
 }
 
 void caso():
@@ -1129,6 +1129,14 @@ void r_usuario()#USUARIO:
 }
 {
 	t=<R_USUARIO>{jjtThis.setName(t.image);}
+}
+
+void r_base()#BASE_DATOS:
+{
+	Token t;
+}
+{
+	t=<R_BASE>{jjtThis.setName(t.image);}
 }
 
 
