@@ -6,20 +6,20 @@ options
  IGNORE_CASE=true;
 
 }
-PARSER_BEGIN(Analizador)
+PARSER_BEGIN(SubAnalisis)
 
-package Analizador;
+package SubAnalisis;
 
 
 import java.io.*;
 
 
-public class Analizador 
+public class SubAnalisis 
 {
 
 
 }
-PARSER_END(Analizador)
+PARSER_END(SubAnalisis)
 
 TOKEN:
 {
@@ -179,16 +179,10 @@ SimpleNode Programa()#PROGRAMA :
 void inicio():
 {}
 {
-	sentencias()
+	SubSentencias()
 	
 }
 
-void sentencias():
-{}
-{
-	sentencia()(LOOKAHEAD(2)sentencias())*
-
-}
 
 void sentencia():
 {}
@@ -531,15 +525,15 @@ void alterado():
 void accion_alterado_tabla():
 {}
 {
-	r_agregar()<PAR_IZ>Campos_Tabla()<PAR_DER>
-	|r_quitar()campos()
+	 <R_AGREGAR><PAR_IZ>Campos_Tabla()<PAR_DER>
+	|<R_QUITAR>campos()
 }
 
 void accion_alterado_objeto():
 {}
 {
-	r_agregar()<PAR_IZ>Parametros()<PAR_DER>
-	|r_quitar()campos()
+	 <R_AGREGAR><PAR_IZ>Parametros()<PAR_DER>
+	|<R_QUITAR>campos()
 }
 
 void Eliminar():
@@ -552,10 +546,10 @@ void Eliminar():
 void objetos_eliminar():
 {}
 {
-	 r_tabla()
-	|r_base()
-	|r_objeto()
-	|r_usario()
+	 <R_TABLA>
+	|<R_BASE>
+	|<R_OBJETO>
+	|<R_USUARIO>
 }
 
 void Declarar():
@@ -1130,31 +1124,6 @@ void r_usuario()#USUARIO:
 {
 	t=<R_USUARIO>{jjtThis.setName(t.image);}
 }
-
-void r_base()#BASE_DATOS:
-{
-	Token t;
-}
-{
-	t=<R_BASE>{jjtThis.setName(t.image);}
-}
-
-void r_agregar()#AGREGAR:
-{
-	Token t;
-}
-{
-	t=<R_AGREGAR>{jjtThis.setName(t.image);}
-}
-
-void r_quitar()#QUITAR:
-{
-	Token t;
-}
-{
-	t=<R_QUITAR>{jjtThis.setName(t.image);}
-}
-
 
 
 JAVACODE 

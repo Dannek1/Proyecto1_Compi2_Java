@@ -531,15 +531,15 @@ void alterado():
 void accion_alterado_tabla():
 {}
 {
-	 <R_AGREGAR><PAR_IZ>Campos_Tabla()<PAR_DER>
-	|<R_QUITAR>campos()
+	r_agregar()<PAR_IZ>Campos_Tabla()<PAR_DER>
+	|r_quitar()campos()
 }
 
 void accion_alterado_objeto():
 {}
 {
-	 <R_AGREGAR><PAR_IZ>Parametros()<PAR_DER>
-	|<R_QUITAR>campos()
+	r_agregar()<PAR_IZ>Parametros()<PAR_DER>
+	|r_quitar()campos()
 }
 
 void Eliminar():
@@ -552,10 +552,10 @@ void Eliminar():
 void objetos_eliminar():
 {}
 {
-	 <R_TABLA>
-	|<R_BASE>
-	|<R_OBJETO>
-	|<R_USUARIO>
+	 r_tabla()
+	|r_base()
+	|r_objeto()
+	|r_usario()
 }
 
 void Declarar():
@@ -618,7 +618,7 @@ void Switch():
 void casos():
 {}
 {
-	 caso()(casos())?
+		caso()(casos())?
 }
 
 void caso():
@@ -1130,6 +1130,31 @@ void r_usuario()#USUARIO:
 {
 	t=<R_USUARIO>{jjtThis.setName(t.image);}
 }
+
+void r_base()#BASE_DATOS:
+{
+	Token t;
+}
+{
+	t=<R_BASE>{jjtThis.setName(t.image);}
+}
+
+void r_agregar()#AGREGAR:
+{
+	Token t;
+}
+{
+	t=<R_AGREGAR>{jjtThis.setName(t.image);}
+}
+
+void r_quitar()#QUITAR:
+{
+	Token t;
+}
+{
+	t=<R_QUITAR>{jjtThis.setName(t.image);}
+}
+
 
 
 JAVACODE 

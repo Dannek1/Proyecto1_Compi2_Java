@@ -31,6 +31,7 @@ import Elementos.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.w3c.dom.Node;
 /**
  *
  * @author Dannek
@@ -1554,7 +1555,7 @@ public class Manejo implements Datos.Iface {
                 DocumentBuilder builder = factory.newDocumentBuilder();
                 Document doc = builder.parse(new File("C:/Base_Compi2/BD/" + Base + "_PRO.usac"));
 
-                NodeList items = doc.getElementsByTagName("proc");
+                NodeList items = doc.getElementsByTagName("Proc");
 
                 int ix = 0;
                 while (ix < items.getLength()) {
@@ -1565,6 +1566,8 @@ public class Manejo implements Datos.Iface {
                     if (element2.getTextContent().equals("\"" + funcion + "\"")) {
                         respuesta = true;
                         break;
+                    }else{
+                        ix++;
                     }
                 }
 
@@ -1585,7 +1588,7 @@ public class Manejo implements Datos.Iface {
                 DocumentBuilder builder = factory.newDocumentBuilder();
                 Document doc = builder.parse(new File("C:/Base_Compi2/BD/" + Base + "_PRO.usac"));
 
-                NodeList items = doc.getElementsByTagName("proc");
+                NodeList items = doc.getElementsByTagName("Proc");
 
                 int ix = 0;
                 while (ix < items.getLength()) {
@@ -1596,7 +1599,9 @@ public class Manejo implements Datos.Iface {
                     if (element2.getTextContent().equals("\"" + funcion + "\"")) {
                         NodeList sentencias = element.getElementsByTagName("src");
                         Respuesta = sentencias.item(0).getTextContent();
-                        
+                        break;
+                    }else{
+                        ix++;
                     }
                 }
 
@@ -1623,6 +1628,228 @@ public class Manejo implements Datos.Iface {
             }            
         }
         
+        return Respuesta;
+    }
+    
+    String Actualiza_Todo(String Tabla,String campos, String Datos){
+        String respuesta="";   
+        
+        Datos=EliminaCaracteres(Datos);
+        
+        String[] campo=campos.split(",");
+        String[] dato=Datos.split(",");
+        
+            try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new File("C:/Base_Compi2/BD/" + Tabla + ".usac"));
+
+            NodeList items = doc.getElementsByTagName("Tabla");
+            Element element = (Element) items.item(0);
+            
+            NodeList filas = element.getElementsByTagName("Row");
+            
+                for (int x = 0; x < filas.getLength(); x++) {
+                    Element elemento = (Element) filas.item(x);
+                    NodeList elementos = elemento.getChildNodes();
+
+                    for (int z = 0; z < elementos.getLength(); z++) {
+                        Node temp = elementos.item(z);
+
+                        for (int y = 0; y < campo.length; y++) {
+
+                            if (temp.getNodeName().equals(campo[y])) {
+                                temp.setTextContent(dato[y]);
+                            }
+                        }
+
+                    }
+
+                }
+            
+                  
+
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Result output = new StreamResult(new File("C:/Base_Compi2/BD/" + Tabla + ".usac"));
+            Source input = new DOMSource(doc);
+            transformer.transform(input, output);
+            
+          
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return respuesta;
+    }
+    
+    String Actualiza_Selec(String Tabla,String camposs,String Datos,String camposc,String datosc){
+        String respuesta="";   
+        
+        Datos=EliminaCaracteres(Datos);
+        datosc=EliminaCaracteres(datosc);
+        
+        String[] campo=camposs.split(",");
+        String[] dato=Datos.split(",");
+        
+        String[] campoc=camposc.split(",");
+        String[] datoc=datosc.split(",");
+        
+            try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new File("C:/Base_Compi2/BD/" + Tabla + ".usac"));
+
+            NodeList items = doc.getElementsByTagName("Tabla");
+            Element element = (Element) items.item(0);
+            
+            NodeList filas = element.getElementsByTagName("Row");
+            
+            for(int x=0;x<filas.getLength();x++){
+                boolean cumple=false;
+                Node temp=filas.item(x);
+                
+                for(int y=0;y<campo.length;y++){
+                    
+                    if(temp.getNodeName().equals(campoc[y])){
+                        if(temp.getTextContent().equals(datoc[y])){
+                            cumple=true;
+                        }
+                    }
+                }
+                
+                
+                if(cumple){
+                    for (int y = 0; y < campo.length; y++) {
+
+                            if (temp.getNodeName().equals(campo[y])) {
+                                temp.setTextContent(dato[y]);
+                            }
+                        }
+                }
+                
+            }
+            
+                  
+
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Result output = new StreamResult(new File("C:/Base_Compi2/BD/" + Tabla + ".usac"));
+            Source input = new DOMSource(doc);
+            transformer.transform(input, output);
+            
+          
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return respuesta;
+    }
+   
+    String Eliminar(String tipo, String objeto){
+        String Respuesta="";
+        
+        switch (tipo){
+            
+            case "TABLA":
+                if (Existe("C:\\Base_Compi2\\BD\\" + objeto + ".usac")) {
+                   File file=new File("C:\\Base_Compi2\\BD\\" + objeto + ".usac");
+                   file.delete();
+                   Respuesta="Tabla: "+objeto+" Eliminada";
+               }else{
+                   Respuesta="NO existe ninguna Tabla con el nombre: "+objeto;
+               } 
+            break;    
+            
+            case "OBJETO":
+                if(!BASE_USO.equals("")){
+                    try {
+                        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                        DocumentBuilder builder = factory.newDocumentBuilder();
+                        Document doc = builder.parse(new File("C:/Base_Compi2/BD/" + BASE_USO + "_OBJ.usac"));
+
+                        NodeList items = doc.getElementsByTagName("Objeto");
+                        Element element = (Element) items.item(0);
+
+                        NodeList objetos = element.getElementsByTagName("OBJ");
+                        for(int x=0;x<objetos.getLength();x++){
+                            Element elemento=(Element) objetos.item(x);
+                            NodeList datos=elemento.getElementsByTagName("nombre");
+                            Node nombre=datos.item(0);
+                            if(nombre.getTextContent().equals("\""+objeto+"\"")){
+                                elemento.getParentNode().removeChild(elemento);
+                                Respuesta="Objeto:" +objeto+" eliminado";
+                                break;
+                            }
+                            
+                            if(x==(objetos.getLength()-1)){
+                                Respuesta="El Objeto:"+objeto+" no Existe";
+                            }
+                        }
+                                               
+
+                        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+                        Result output = new StreamResult(new File("C:/Base_Compi2/BD/" + BASE_USO + "_OBJ.usac"));
+                        Source input = new DOMSource(doc);
+                        transformer.transform(input, output);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    Respuesta ="No hay ninguna base en uso";
+                }
+            break;
+            
+            case "BASE_DATOS":
+               if (Existe("C:\\Base_Compi2\\BD\\" + objeto + ".usac")) {
+                   File file=new File("C:\\Base_Compi2\\BD\\" + objeto + ".usac");
+                   file.delete();
+                   file=new File("C:\\Base_Compi2\\BD\\" + objeto + "_OBJ.usac");
+                   file.delete();
+                   file=new File("C:\\Base_Compi2\\BD\\" + objeto + "_PRO.usac");
+                   file.delete();
+                   Respuesta="Base de Datos: "+objeto+" Eliminada";
+               }else{
+                   Respuesta="NO existe ninguna base de dato con el nombre: "+objeto;
+               } 
+            break;
+            
+            case "USUARIO":
+                try {
+                        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                        DocumentBuilder builder = factory.newDocumentBuilder();
+                        Document doc = builder.parse(new File("C:/Base_Compi2/BD/Tabla_Usuarios.usac"));
+
+                        NodeList items = doc.getElementsByTagName("Tabla");
+                        Element element = (Element) items.item(0);
+
+                        NodeList objetos = element.getElementsByTagName("Row");
+                        for(int x=0;x<objetos.getLength();x++){
+                            Element elemento=(Element) objetos.item(x);
+                            NodeList datos=elemento.getElementsByTagName("Usuario");
+                            Node nombre=datos.item(0);
+                            if(nombre.getTextContent().equals(objeto)){
+                                elemento.getParentNode().removeChild(elemento);
+                                Respuesta="Usuario:" +objeto+" eliminado";
+                                break;
+                            }
+                            
+                            if(x==(objetos.getLength()-1)){
+                                Respuesta="El Objeto:"+objeto+" no Existe";
+                            }
+                        }
+                                               
+
+                        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+                        Result output = new StreamResult(new File("C:/Base_Compi2/BD/Tabla_Usuarios.usac"));
+                        Source input = new DOMSource(doc);
+                        transformer.transform(input, output);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+            break;
+            
+        }
         return Respuesta;
     }
     
@@ -1789,7 +2016,7 @@ public class Manejo implements Datos.Iface {
                 } else {
                     System.out.println(((SimpleNode) raiz.children[0]).name);
                     String nombrePRO = ((SimpleNode) raiz.children[0]).name;
-                    //Ejecutar=false;
+                    Ejecutar=false;
                     if (raiz.children.length > 2) {
                     String Param_Objet = Ejecuccion((SimpleNode) raiz.children[1]);
                     String sentencias= Ejecuccion((SimpleNode) raiz.children[2]);
@@ -1971,15 +2198,19 @@ public class Manejo implements Datos.Iface {
             break;
             
             case 30://Actualizar
+                
                 if(Ejecutar){
                     TABLA_aux=((SimpleNode) raiz.children[0]).name;
-                    String CAMPOS_aux=Ejecuccion((SimpleNode) raiz.children[0]);
-                    String VALORES_aux=Ejecuccion((SimpleNode) raiz.children[1]);
+                    String CAMPOS_aux=Ejecuccion((SimpleNode) raiz.children[1]);
+                    String VALORES_aux=Ejecuccion((SimpleNode) raiz.children[2]);
                     //Condicion
-                    if (raiz.children.length > 4) {
-                        hacer=1;
+                    if (raiz.children.length == 5) {
+                        String condiciones=Ejecuccion((SimpleNode) raiz.children[3]);
+                        System.out.println("prueba");
                     }else{
+                        Actualiza_Todo(TABLA_aux,CAMPOS_aux,VALORES_aux);
                         //Ejecutar
+                        
                     }
                 }else{
                     if (raiz.children.length > 4) {
@@ -2095,6 +2326,17 @@ public class Manejo implements Datos.Iface {
                 
             break;
             
+            case 47://eliminar
+                String obj_elim=Ejecuccion((SimpleNode) raiz.children[0]);   
+                String eliminado=((SimpleNode) raiz.children[1]).name;      
+                
+                Eliminar(obj_elim,eliminado);
+            break;
+            
+            case 48://objetos_eliminar
+                Respuesta=((SimpleNode) raiz.children[0]).name;
+            break;    
+            
             case 49://Declarar
                 if (Ejecutar) {
                     String variables = Ejecuccion((SimpleNode) raiz.children[0]);
@@ -2107,9 +2349,9 @@ public class Manejo implements Datos.Iface {
                     }
                 } else {
                     if (raiz.children.length == 4) {
-                        Respuesta="DECLARAR "+Ejecuccion((SimpleNode) raiz.children[0])+" "+((SimpleNode) raiz.children[1]).name +"="+Ejecuccion((SimpleNode) raiz.children[2]);
+                        Respuesta="DECLARAR "+Ejecuccion((SimpleNode) raiz.children[0])+" "+((SimpleNode) raiz.children[1]).name +"="+Ejecuccion((SimpleNode) raiz.children[2])+";";
                     }else{
-                        Respuesta="DECLARAR "+Ejecuccion((SimpleNode) raiz.children[0])+" "+((SimpleNode) raiz.children[1]).name;
+                        Respuesta="DECLARAR "+Ejecuccion((SimpleNode) raiz.children[0])+" "+((SimpleNode) raiz.children[1]).name+";";
                     }
                     
                 }
@@ -2178,29 +2420,40 @@ public class Manejo implements Datos.Iface {
             break;
             
             case 56://Switch
-                
-                EXP_SWITCH=Ejecuccion((SimpleNode) raiz.children[0]);
-                AMBITO="swith";
-                String r2=Ejecuccion((SimpleNode) raiz.children[1]);
-                
-                if(raiz.children.length==3){
-                    if(Detener==false){                      
-                        Ejecuccion((SimpleNode) raiz.children[2]);
+                if (Ejecutar) {
+                    EXP_SWITCH = Ejecuccion((SimpleNode) raiz.children[0]);
+                    AMBITO = "swith";
+                    String r2 = Ejecuccion((SimpleNode) raiz.children[1]);
+
+                    if (raiz.children.length == 3) {
+                        if (Detener == false) {
+                            Ejecuccion((SimpleNode) raiz.children[2]);
+                        }
+
                     }
+                    
+                    Detener=true;
                     
                 }else{
                     
+                    if (raiz.children.length == 3) {
+                        Respuesta="SELECCIONA("+Ejecuccion((SimpleNode) raiz.children[0])+"){"+Ejecuccion((SimpleNode) raiz.children[1])+"\n"+Ejecuccion((SimpleNode) raiz.children[2])+"}";
+                    }else{
+                        Respuesta="SELECCIONA("+Ejecuccion((SimpleNode) raiz.children[0])+"){"+Ejecuccion((SimpleNode) raiz.children[1])+"}";
+                    }
+                    
                 }
+              
                 
-                Detener=true;
                 
             break;
             
             case 57://Casos
+                
                 if(raiz.children.length==2){
                     Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
                     if(Detener==false){
-                    Respuesta=Ejecuccion((SimpleNode) raiz.children[1]);
+                    Respuesta+=Ejecuccion((SimpleNode) raiz.children[1]);
                     }
                 }else{
                     Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
@@ -2208,19 +2461,25 @@ public class Manejo implements Datos.Iface {
             break;
             
             case 58://Caso
-                Variable temp1=variables.Buscar(EXP_SWITCH);
-                String caso=Ejecuccion((SimpleNode) raiz.children[0]);
-                
-                if(temp1.getValor().equals(caso) ||Ejecutar_Swithc){
-                    Ejecutar_Swithc=true;
-                    String c=Ejecuccion((SimpleNode) raiz.children[1]);
-                    int asig=Integer.parseInt(temp1.getValor());
-                    asig++;
-                    Asignacion(EXP_SWITCH,String.valueOf(asig));
-                    if(c.equals("Detener")){
-                        Detener=true;
+                if(Ejecutar){
+                    Variable temp1=variables.Buscar(EXP_SWITCH);
+                    String caso=Ejecuccion((SimpleNode) raiz.children[0]);
+
+                    if(temp1.getValor().equals(caso) ||Ejecutar_Swithc){
+                        Ejecutar_Swithc=true;
+                        String c=Ejecuccion((SimpleNode) raiz.children[1]);
+                        int asig=Integer.parseInt(temp1.getValor());
+                        asig++;
+                        Asignacion(EXP_SWITCH,String.valueOf(asig));
+                        if(c.equals("Detener")){
+                            Detener=true;
+                        }
                     }
+                }else{
+                   Respuesta="caso" +Ejecuccion((SimpleNode) raiz.children[0])+":"+Ejecuccion((SimpleNode) raiz.children[1]);  
                 }
+                
+                    
                 
             break;
             
@@ -2243,19 +2502,30 @@ public class Manejo implements Datos.Iface {
                     
                      
                 } else {
-                    if (((SimpleNode) raiz.children[0]).name.equals("DETENER")) {
+                    
+                    try{
+                        if (((SimpleNode) raiz.children[0]).name.equals("DETENER")) {
                         Respuesta = "Detener;";
-                    } else if (raiz.children.length == 2) {
-                        Respuesta = Ejecuccion((SimpleNode) raiz.children[0])+" "+Ejecuccion((SimpleNode) raiz.children[1]);;
-                    } else {
-                        Respuesta = Ejecuccion((SimpleNode) raiz.children[0]);
+                        }
+                    } catch (Exception ex) {
+                        if (raiz.children.length == 2) {
+                            Respuesta = Ejecuccion((SimpleNode) raiz.children[0])+" "+Ejecuccion((SimpleNode) raiz.children[1]);
+                        } else {
+                            Respuesta = Ejecuccion((SimpleNode) raiz.children[0]);
+                        }
                     }
+                     
                 }
                 
             break;
             
             case 60://Defecto
-                Respuesta = Ejecuccion((SimpleNode) raiz.children[0]);
+                if(Ejecutar){
+                   Respuesta = Ejecuccion((SimpleNode) raiz.children[0]);     
+                }else{
+                   Respuesta = "DEFECTO:" +Ejecuccion((SimpleNode) raiz.children[0]);     
+                }
+                
             break;
             
             
@@ -2635,7 +2905,15 @@ public class Manejo implements Datos.Iface {
                     if(Existefuncion(Proc_name,BASE_USO)){
                         String instrucciones=Ejecutar_Proc(Proc_name,BASE_USO);
                          InputStream is = new ByteArrayInputStream(instrucciones.getBytes());
-                        //Respuesta
+                         Analizador a = new Analizador(is, "UTF-8");
+                        try {
+                            SimpleNode subraiz = a.Programa();
+                            Respuesta=Ejecuccion(subraiz);
+                            
+                            //Respuesta
+                        } catch (ParseException ex) {
+                            System.out.println(ex);
+                        }
                     }else{
                         Respuesta="No Existe el Procedimiento:"+Proc_name+" en la base:"+BASE_USO;
                     }
