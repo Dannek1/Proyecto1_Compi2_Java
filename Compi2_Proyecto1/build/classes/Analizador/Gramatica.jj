@@ -1760,29 +1760,29 @@ void accion_alterado_tabla():
   jjtree.openNodeScope(jjtn000);
 /*@egen*/}
 {/*@bgen(jjtree) accion_alterado_tabla */
-        try {
+         try {
 /*@egen*/
-	r_agregar()<PAR_IZ>Campos_Tabla()<PAR_DER>
+	 r_agregar()<PAR_IZ>Campos_Tabla()<PAR_DER>
 	|r_quitar()campos()/*@bgen(jjtree)*/
-        } catch (Throwable jjte000) {
-          if (jjtc000) {
-            jjtree.clearNodeScope(jjtn000);
-            jjtc000 = false;
-          } else {
-            jjtree.popNode();
-          }
-          if (jjte000 instanceof RuntimeException) {
-            throw (RuntimeException)jjte000;
-          }
-          if (jjte000 instanceof ParseException) {
-            throw (ParseException)jjte000;
-          }
-          throw (Error)jjte000;
-        } finally {
-          if (jjtc000) {
-            jjtree.closeNodeScope(jjtn000, true);
-          }
-        }
+         } catch (Throwable jjte000) {
+           if (jjtc000) {
+             jjtree.clearNodeScope(jjtn000);
+             jjtc000 = false;
+           } else {
+             jjtree.popNode();
+           }
+           if (jjte000 instanceof RuntimeException) {
+             throw (RuntimeException)jjte000;
+           }
+           if (jjte000 instanceof ParseException) {
+             throw (ParseException)jjte000;
+           }
+           throw (Error)jjte000;
+         } finally {
+           if (jjtc000) {
+             jjtree.closeNodeScope(jjtn000, true);
+           }
+         }
 /*@egen*/
 }
 
@@ -4107,7 +4107,7 @@ void r_agregar()        :
         SimpleNode jjtn000 = new SimpleNode(JJTAGREGAR);
         boolean jjtc000 = true;
         jjtree.openNodeScope(jjtn000);
-/*@egen*/
+/*@egen*/	
 	Token t;
 }
 {/*@bgen(jjtree) AGREGAR */

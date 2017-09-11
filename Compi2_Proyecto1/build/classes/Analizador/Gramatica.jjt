@@ -531,7 +531,7 @@ void alterado():
 void accion_alterado_tabla():
 {}
 {
-	r_agregar()<PAR_IZ>Campos_Tabla()<PAR_DER>
+	 r_agregar()<PAR_IZ>Campos_Tabla()<PAR_DER>
 	|r_quitar()campos()
 }
 
@@ -1140,7 +1140,7 @@ void r_base()#BASE_DATOS:
 }
 
 void r_agregar()#AGREGAR:
-{
+{	
 	Token t;
 }
 {
