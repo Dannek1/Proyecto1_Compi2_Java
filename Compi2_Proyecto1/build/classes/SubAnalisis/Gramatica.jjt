@@ -1,0 +1,1137 @@
+options
+{
+ CHOICE_AMBIGUITY_CHECK=4;
+ STATIC=false;
+ FORCE_LA_CHECK=false;
+ IGNORE_CASE=true;
+
+}
+PARSER_BEGIN(SubAnalisis)
+
+package SubAnalisis;
+
+
+import java.io.*;
+
+
+public class SubAnalisis 
+{
+
+
+}
+PARSER_END(SubAnalisis)
+
+TOKEN:
+{
+	//Operadores aritmeticos
+	  <SUMA : "+" >  //1
+	| <RESTA:"-"> 	//2
+	| <MULTI:"*"> 	//3
+	| <DIV:"/"> 	//4
+	| <POW: "^">	//5
+	| <INCR: "++" > 	//6
+	| <DECR: "--" > 	//7
+	| <I_ASIG:"=">		//8
+	
+}
+
+TOKEN:
+{
+	//Operadores Relacionales
+	  <IGUAL:"=="> //9
+	| <DISTINTO:"!="> //10
+	| <MENOR:"<"> //11
+	| <MAYOR:">"> //12
+	| <MENOR_IGUAL:"<="> //13
+	| <MAYOR_IGUAL:">="> //14
+	
+}
+
+TOKEN:
+{
+	//Operadores Logicos
+	  <OR:"||"> //15
+	| <AND:"&&"> //16
+	| <NOT:"!"> //17
+	
+}
+
+TOKEN:
+{
+	//Contenedores
+	  <PAR_IZ:"("> //18
+	| <PAR_DER:")"> //19
+	| <COR_IZ:"{"> //20
+	| <COR_Der:"}"> //21
+}
+
+TOKEN:
+{
+	//Reservadas
+	  <PUNTO_COMA:";"> //22
+	| <COMA:","> //23  
+	| <PUNTO:"."> //24
+	| <R_USAR:"USAR"> //25
+	| <R_CREAR:"CREAR"> //26
+	| <R_BASE:"BASE_DATOS"> //27
+	| <R_TABLA:"TABLA"> //28
+	| <R_OBJETO:"OBJETO"> //29
+	| <R_PROCEDIMIENTO:"PROCEDIMIENTO"> //30
+	| <R_FUNCION:"FUNCION"> //31
+	| <R_RETORNO:"RETORNO"> //32
+	| <R_USUARIO:"USUARIO"> //33
+	| <R_COLOCAR:"COLOCAR"> //34
+	| <R_PAS:"password"> //35
+	| <R_IMPRIMIR:"IMPRIMIR"> //36
+	| <R_INSERTAR:"INSERTAR"> //37
+	| <R_EN:"EN"> //38
+	| <R_VALORES:"VALORES"> //39
+	| <R_ACTUALIZAR:"ACTUALIZAR"> //40
+	| <R_DONDE:"DONDE"> //41
+	| <R_BORRAR:"BORRAR"> //42
+	| <R_SELECCIONAR:"SELECCIONAR"> //43
+	| <R_DE:"DE"> //44
+	| <R_ORDENAR:"ORDENAR_POR"> //45
+	| <R_ASC:"ASC"> //46
+	| <R_DESC:"DESC"> //47
+	| <R_OTORGAR:"OTORGAR"> //48
+	| <R_PERMISOS:"PERMISOS"> //49
+	| <R_DENEGAR:"DENEGAR"> //50
+	| <R_BACKUP:"BACKUP"> //51
+	| <R_USQLDUMP:"USQLDUMP"> //52
+	| <R_COMPLETO:"COMPLETO"> //53
+	| <R_RESTAURAR:"RESTAURAR"> //54
+	| <R_ALTERAR:"ALTERAR"> //55
+	| <R_AGREGAR:"AGREGAR"> //56
+	| <R_QUITAR:"QUITAR"> //57
+	| <R_CAMBIAR:"CAMBIAR"> //58
+	| <R_ELIMINAR:"ELIMINAR"> //59
+	| <R_DECLARAR:"DECLARAR"> //60
+	| <R_SI:"SI"> //61
+	| <R_SINO:"SINO"> //62
+	| <R_SELECCIONA:"SELECCIONA"> //63
+	| <R_CASO:"CASO"> //64
+	| <R_DEFECTO:"DEFECTO"> //65
+	| <R_PARA:"PARA"> //66
+	| <R_MIENTRAS:"MIENTRAS"> //67
+	| <R_DETENER:"DETENER"> //68
+	| <R_FECHA:"FECHA"> //69
+	| <R_FECHA_HORA:"FECHA_HORA"> //70
+	| <R_CONTAR:"CONTAR"> //71
+	
+	//tipos de Datos
+	| <R_TEXT:"TEXT"> //72
+	| <R_INTEGER:"INTEGER"> //73
+	| <R_DOUBLE:"DOUBLE"> //74
+	| <R_BOOL:"BOOL"> //75
+	| <R_DATE:"DATE"> //76
+	| <R_DATETIME:"DATETIME"> //77
+	
+	//Atributos de campos de tablas
+    | <R_NO:"No"> //78
+	| <R_NULO:"Nulo"> //79  
+	| <R_AUTOINCREMENTABLE:"Autoincrementable"> //80
+	| <R_PK:"Llave_Primaria"> //81
+	| <R_FK:"Llave_Foranea"> //82
+	| <R_UNICO:"Unico"> //83
+
+	//COMILLAS
+	| <R_COMILLAS:"\""> //84
+
+        
+}
+
+TOKEN:
+{	
+	//Expresiones Regulares
+	
+	  <ID : ["a"-"z","A"-"Z","@"](["a"-"z","A"-"Z","0"-"9","_"])*>  //85
+	| <ENTERO : (["0"-"9"])+>  //86
+	| <DECIMAL : (["0"-"9"])+["."](["0"-"9"])+ > //87
+	| <CADENA:  "\""(~["\""])+"\"">//88
+	| <FECHA:  (["1"-"3"])*["0"-"9"]["-"]["0"-"1"]["0"-"9"]["-"]["1"-"9"]["0"-"9"]["0"-"9"]["0"-"9"]>	//89
+	| <FECHA_HORA:  <FECHA>[" "](["0"-"2"])*["0"-"9"][":"]["0"-"5"]["0"-"9"][":"]["0"-"5"]["0"-"9"]>	//90
+	
+	| <DOS_PUNTO:":"> //91
+	| <BOOLEAN:"verdadero"|"falso"> //92
+	
+    
+}
+SKIP : 
+{ 
+	 " "
+        |"\n" 
+        | "\r\n"
+        |"\r" 
+        | "\t"
+        | "\f"
+        |<"#"(~["\n"])+>
+        |<"#"<MULTI>["a"-"z","A"-"Z","0"-"9"," "](["a"-"z","A"-"Z","0"-"9"," ",":",";",".","@","\n","\r","\t","\f"])*<MULTI>"#">
+}
+
+SimpleNode Programa()#PROGRAMA :
+{}
+{
+	inicio()<EOF>{return jjtThis;}
+
+}
+
+void inicio():
+{}
+{
+	SubSentencias()
+	
+}
+
+
+void sentencia():
+{}
+{
+	 Usar()
+	|crear()
+	|Imprimir()
+	|Insertar()
+	|Actualizar()
+	|Borrar()
+	|Seleccionar()
+	|Otorgar()
+	|Denegar()
+	|back()
+	|restaurar()
+	|Alterar()
+	|Eliminar()
+	|Declarar()
+	|Contar()
+	|Procedimiento()
+
+        
+}
+
+void Usar():
+{}
+{
+	r_usar()r_id()r_punto_coma()
+        
+
+}
+
+void r_usar()#USAR:
+{
+	Token t;
+}
+{
+	t=<R_USAR>{jjtThis.setName(t.image);}
+}
+
+void r_id()#ID:
+{
+	Token t;
+}
+{
+	t=<ID>{jjtThis.setName(t.image);}
+}
+
+void r_punto_coma()#PUNTO_COMA:
+{
+	Token t;
+}
+{
+	t=<PUNTO_COMA>{jjtThis.setName(t.image);}
+}
+
+
+void crear():
+{}
+{
+	r_crear()Opciones_Crear()
+}
+
+void r_crear()#CREAR:
+{
+	Token t;
+}
+{
+	t=<R_CREAR>{jjtThis.setName(t.image);}
+}
+
+void Opciones_Crear():
+{}
+{       
+	 C_Base()
+	|C_Tabla()
+	|C_Objeto()
+	|C_Pro()
+	|C_Funcion()
+	|C_Usuario()
+}
+
+void C_Base():
+{}
+{
+	<R_BASE>r_id()r_punto_coma()
+}
+
+void C_Tabla():
+{}
+{
+	<R_TABLA>r_id()<PAR_IZ>Campos_Tabla()<PAR_DER>r_punto_coma()
+        
+}
+
+void Campos_Tabla():
+{}
+{
+	Campo_Tabla()(Campos_Tabla_prima())*
+        
+}
+
+void Campos_Tabla_prima():
+{}
+{
+	<COMA>Campo_Tabla()
+      
+}
+
+void Campo_Tabla():
+{}
+{
+	 Tipo_Dato()r_id()(Complemento())*
+}
+
+void Complemento()#COMPLEMENTO:
+{
+	Token t;
+}
+{
+	 t=<R_NO>{jjtThis.setName(t.image);}
+	|t=<R_NULO>{jjtThis.setName(t.image);}
+	|t=<R_AUTOINCREMENTABLE>{jjtThis.setName(t.image);}
+	|t=<R_PK>{jjtThis.setName(t.image);}
+	|t=<R_FK>r_id(){jjtThis.setName(t.image+" "+((SimpleNode) jjtn000.children[0]).name);}
+	|t=<R_UNICO>{jjtThis.setName(t.image);}
+        
+            
+}
+
+void C_Objeto():
+{}
+{
+	<R_OBJETO>r_id()<PAR_IZ>(Parametros())*<PAR_DER>r_punto_coma()
+}
+
+
+void Parametros():
+{}
+{
+	Parametro()(<COMA>Parametro())*
+}
+
+void Parametro():
+{}
+{
+	Tipo_Dato()r_id()
+}
+
+void C_Pro():
+{}
+{
+	<R_PROCEDIMIENTO>r_id()<PAR_IZ>(Parametros())*<PAR_DER><COR_IZ>SubSentencias()<COR_Der>
+        
+}
+
+
+
+void SubSentencia():
+{}
+{
+	 LOOKAHEAD(3)Asignacion()
+	|IF()
+	|Switch()
+	|For()
+	|While()
+	|LOOKAHEAD(3)Fecha()
+	|LOOKAHEAD(2)Fecha_Hora()
+	|sentencia()
+}
+
+void C_Funcion():
+{}
+{
+	<R_FUNCION>r_id()<PAR_IZ>(Parametros())*<PAR_DER>Tipo_Dato()<COR_IZ>Sentencias_Retorno()<COR_Der>
+    
+}
+
+void Sentencias_Retorno():
+{}
+{
+	(SubSentencia())+Retorno()
+	
+}
+
+void Retorno():
+{}
+{
+	<R_RETORNO>aritmetica()r_punto_coma()
+}
+
+void  C_Usuario():
+{}
+{
+	<R_USUARIO>r_id()<R_COLOCAR><R_PAS><I_ASIG>Expresion()r_punto_coma()
+}
+
+void Imprimir():
+{}
+{
+	<R_IMPRIMIR><PAR_IZ>Expresion()<PAR_DER>r_punto_coma()
+        
+}
+
+void Insertar():
+{}
+{	
+	<R_INSERTAR><R_EN><R_TABLA>r_id()<PAR_IZ>tipo_insercion()
+}
+
+void tipo_insercion():
+{}
+{
+	 LOOKAHEAD(5)campos()<PAR_DER><R_VALORES><PAR_IZ>Valor()<PAR_DER>r_punto_coma()
+	|LOOKAHEAD(5)Valor()<PAR_DER>r_punto_coma()
+
+}
+
+void campos():
+{}
+{
+	 LOOKAHEAD(2)campo()<COMA>campos()
+	|LOOKAHEAD(2)campo()
+}
+
+void campo():
+{}
+{
+	r_id()
+	|r_usuario()
+}
+
+void Valor():
+{}
+{
+	aritmetica()(LOOKAHEAD(2)<COMA> Valor())?
+}
+
+void Actualizar():
+{}
+{
+	<R_ACTUALIZAR><R_TABLA>r_id()<PAR_IZ>campos()<PAR_DER><R_VALORES><PAR_IZ>Valor()<PAR_DER>(Condicionar())?r_punto_coma()
+        
+}
+
+void Condicionar():
+{}
+{
+	 <R_DONDE> logica_Conusltas()
+	
+}
+
+void Borrar():
+{}
+{
+	<R_BORRAR><R_EN><R_TABLA>r_id() Condicionar()r_punto_coma()
+}
+
+void Seleccionar():
+{}
+{
+	<R_SELECCIONAR> Campos_Seleccion() <R_DE> r_id() (Condicionar())? (Ordenamiento())? r_punto_coma()
+        
+}
+
+void Campos_Seleccion():
+{}
+{
+	 <MULTI>
+	|campos()
+}
+
+void Ordenamiento():
+{}
+{
+	 <R_ORDENAR>r_id()Modo_Orden()
+}
+
+void Modo_Orden():
+{}
+{
+	 r_asc()
+	|r_desc()	
+}
+
+void Otorgar():
+{}
+{
+	<R_OTORGAR><R_PERMISOS>r_id()<COMA>r_id()<PUNTO>Objeto() r_punto_coma()
+}
+
+void Objeto():
+{}
+{
+	 <MULTI>
+	|r_id()
+}
+
+void Denegar():
+{}
+{
+	<R_DENEGAR><R_PERMISOS>r_id()<COMA>r_id()<PUNTO>Objeto() r_punto_coma()
+}
+
+void back():
+{}
+{
+	<R_BACKUP>tipo_back()r_id() r_id()r_punto_coma()
+        
+}
+
+void tipo_back():
+{}
+{
+	 r_umsql()
+	|r_completo()
+}
+
+void restaurar():
+{}
+{
+	<R_RESTAURAR>tipo_back() aritmetica() r_punto_coma()
+}
+
+void Alterar():
+{}
+{
+	<R_ALTERAR> alterado() 
+}
+
+void alterado():
+{}
+{
+	 r_tabla() r_id() accion_alterado_tabla()r_punto_coma()
+	|r_objeto() r_id() accion_alterado_objeto()r_punto_coma()
+	|r_usario() r_id() <R_CAMBIAR> <R_PAS> <I_ASIG>Expresion()r_punto_coma()
+        
+}
+
+void accion_alterado_tabla():
+{}
+{
+	 <R_AGREGAR><PAR_IZ>Campos_Tabla()<PAR_DER>
+	|<R_QUITAR>campos()
+}
+
+void accion_alterado_objeto():
+{}
+{
+	 <R_AGREGAR><PAR_IZ>Parametros()<PAR_DER>
+	|<R_QUITAR>campos()
+}
+
+void Eliminar():
+{}
+{
+	<R_ELIMINAR>objetos_eliminar()r_id()r_punto_coma()
+        
+}
+
+void objetos_eliminar():
+{}
+{
+	 <R_TABLA>
+	|<R_BASE>
+	|<R_OBJETO>
+	|<R_USUARIO>
+}
+
+void Declarar():
+{}
+{
+	<R_DECLARAR> lista_variables() Tipo_Dato()(<I_ASIG> asignacion_declaracion())? r_punto_coma()
+        
+}
+
+void lista_variables():
+{}
+{
+	 LOOKAHEAD(2)variable()<COMA>lista_variables()
+	|LOOKAHEAD(2)variable()
+}
+
+void variable():
+{}
+{
+	r_id()
+}
+
+void asignacion_declaracion():
+{}
+{
+		  
+        aritmetica()(<PAR_IZ>Valor()<PAR_DER>)?
+
+}
+
+void Asignacion():
+{}
+{
+	r_id()<I_ASIG>aritmetica()r_punto_coma()
+        
+}
+
+void IF():
+{}
+{
+	<R_SI> <PAR_IZ>logica()<PAR_DER><COR_IZ>SubSentencias()<COR_Der>(sino_else())?
+        
+}
+
+void sino_else():
+{}
+{
+	 <R_SINO><COR_IZ>SubSentencias()<COR_Der>
+         
+
+}
+
+void Switch():
+{}
+{
+	<R_SELECCIONA><PAR_IZ>aritmetica()<PAR_DER><COR_IZ> casos() (defecto())?<COR_Der>
+        
+}
+
+void casos():
+{}
+{
+		caso()(casos())?
+}
+
+void caso():
+{}
+{
+	<R_CASO> Expresion() <DOS_PUNTO>Sentencias_swithc()
+}
+
+void Sentencias_swithc():
+{}
+{
+	 SubSentencia()(Sentencias_swithc())?
+	|r_detener() r_punto_coma()
+}
+
+void defecto():
+{}
+{
+	 <R_DEFECTO> <DOS_PUNTO>Sentencias_swithc()
+	
+}
+
+void For():
+{}
+{
+	<R_PARA><PAR_IZ>declaracion_for()r_punto_coma()logica()r_punto_coma()operador_for()<PAR_DER><COR_IZ>Sentencias_swithc()<COR_Der>
+        
+}
+
+void declaracion_for():
+{}
+{
+	<R_DECLARAR>r_id() <R_INTEGER> <I_ASIG> aritmetica()
+}
+
+void operador_for():
+{}
+{
+	 r_incr()
+	|r_decr()
+}
+
+void While():
+{}
+{
+	<R_MIENTRAS><PAR_IZ>logica()<PAR_DER><COR_IZ>Sentencias_swithc()<COR_Der>
+        
+}
+
+void Fecha():
+{}
+{
+	r_id()<I_ASIG><R_FECHA><PAR_IZ><PAR_DER>r_punto_coma()
+        
+}
+
+void Fecha_Hora():
+{}
+{
+	r_id()<I_ASIG><R_FECHA_HORA><PAR_IZ><PAR_DER>r_punto_coma()
+        
+}
+
+void Contar():
+{}
+{
+	<R_CONTAR><PAR_IZ><MENOR><MENOR>Seleccionar()<MAYOR><MAYOR><PAR_DER>r_punto_coma()
+        
+}
+
+void Tipo_Dato()#TIPO_DATO:
+{
+	Token t;
+}
+{
+	 t=<R_TEXT>{jjtThis.setName(t.image);}
+	|t=<R_INTEGER>{jjtThis.setName(t.image);}
+	|t=<R_DOUBLE>{jjtThis.setName(t.image);}
+	|t=<R_BOOL>{jjtThis.setName(t.image);}
+	|t=<R_DATE>{jjtThis.setName(t.image);}
+	|t=<R_DATETIME>{jjtThis.setName(t.image);}
+	
+}
+
+//operaciones logicas
+void logica():
+{}
+{
+	log_or()
+}
+
+
+
+void log_or():
+{}
+{
+	 LOOKAHEAD(5)log_and()r_or()log_and()
+	|LOOKAHEAD(5)log_and()
+}
+
+void log_and():
+{}
+{
+	 LOOKAHEAD(5)relacional()r_and()logica()
+	| r_not()logica()
+	| LOOKAHEAD(5)relacional()
+	|r_par_iz()logica()r_par_der()
+}
+
+//operaicones relacionales
+void relacional():
+{}
+{
+	 sub_relacional()(relacional_prima())*
+	
+}
+
+void relacional_prima():
+{}
+{
+	
+	r_igual()sub_relacional() (LOOKAHEAD(2)relacional_prima())*
+	|r_distinto()sub_relacional()(LOOKAHEAD(2)relacional_prima())*
+	|r_menor()sub_relacional()(LOOKAHEAD(2)relacional_prima())*
+	|r_mayor()sub_relacional()(LOOKAHEAD(2)relacional_prima())*
+	|r_menor_igual()sub_relacional()(LOOKAHEAD(2)relacional_prima())*
+	|r_mayor_igual()sub_relacional()(LOOKAHEAD(2)relacional_prima())*
+	
+}
+
+void sub_relacional():
+{}
+{
+	 LOOKAHEAD(5)aritmetica()
+	|LOOKAHEAD(5)r_par_iz()relacional()r_par_der()
+}
+
+//operaciones arimeticas
+void aritmetica():
+{}
+{
+	multi_div() (LOOKAHEAD(2)aritmetica_prima())*
+	
+}
+
+void aritmetica_prima():
+{}
+{	
+	  r_suma()multi_div()(LOOKAHEAD(2)aritmetica_prima())*
+	 |menos()multi_div()(LOOKAHEAD(2)aritmetica_prima())*
+}
+
+void multi_div():
+{}
+{
+	 
+	potenciar() (multi_div_prima())*
+}
+
+void multi_div_prima():
+{}
+{
+	 r_multi()potenciar() (LOOKAHEAD(2)multi_div_prima())*
+	|r_div()potenciar() (LOOKAHEAD(2)multi_div_prima())*
+}
+
+void potenciar():
+{}
+{
+	
+	unario()(potenciar_prima())*
+}
+
+void potenciar_prima():
+{}
+{
+	 r_pow()unario()(LOOKAHEAD(2)potenciar_prima())*
+}
+
+void unario():
+{}
+{
+	 menos()Expresion()
+	|Expresion()
+	|r_par_iz()aritmetica()r_par_der()
+}
+
+void Expresion():
+{}
+{
+	 r_id()
+	|r_entero()
+        |r_decimal()
+        |r_cadena()
+        |r_fecha()
+        |r_fecha_hora()
+		|r_booleano()
+
+}
+
+void menos()#Menos:
+{
+	Token t;
+}
+{
+	t=<RESTA>{jjtThis.setName(t.image);}
+}
+
+void r_entero()#Entero:
+{
+	Token t;
+}
+{
+	t=<ENTERO>{jjtThis.setName(t.image);}
+}
+
+void r_decimal()#DECIMAL:
+{
+	Token t;
+}
+{
+	t=<DECIMAL>{jjtThis.setName(t.image);}
+}
+
+void r_cadena()#CADENA:
+{
+	Token t;
+}
+{
+	t=<CADENA>{jjtThis.setName(t.image);}
+}
+
+void r_fecha()#FECHA:
+{
+	Token t;
+}
+{
+	t=<FECHA>{jjtThis.setName(t.image);}
+}
+
+void r_fecha_hora()#FECHA_HORA:
+{
+	Token t;
+}
+{
+	t=<FECHA_HORA>{jjtThis.setName(t.image);}
+}
+
+void Procedimiento():
+{}
+{
+	r_id()<PAR_IZ>(Parametros())*<PAR_DER>r_punto_coma()
+}
+
+void SubSentencias():
+{}
+{
+	(SubSentencia())+
+}
+
+void r_not()#NOT:
+{
+	Token t;
+}
+{
+	t=<NOT>{jjtThis.setName(t.image);}
+}
+
+void r_and()#AND:
+{
+	Token t;
+}
+{
+	t=<AND>{jjtThis.setName(t.image);}
+}
+
+void r_or()#OR:
+{
+	Token t;
+}
+{
+	t=<OR>{jjtThis.setName(t.image);}
+}
+
+void r_par_iz()#PAR_IZ:
+{
+	Token t;
+}
+{
+	t=<PAR_IZ>{jjtThis.setName(t.image);}
+}
+
+void r_par_der()#PAR_DER:
+{
+	Token t;
+}
+{
+	t=<PAR_DER>{jjtThis.setName(t.image);}
+}
+
+void r_igual()#IGUAL:
+{
+	Token t;
+}
+{
+	t=<IGUAL>{jjtThis.setName(t.image);}
+}
+
+void r_distinto()#DISTINTO:
+{
+	Token t;
+}
+{
+	t=<DISTINTO>{jjtThis.setName(t.image);}
+}
+
+void r_menor()#MENOR:
+{
+	Token t;
+}
+{
+	t=<MENOR>{jjtThis.setName(t.image);}
+}
+
+void r_mayor()#MAYOR:
+{
+	Token t;
+}
+{
+	t=<MAYOR>{jjtThis.setName(t.image);}
+}
+void r_menor_igual()#MENOR_IGUAL:
+{
+	Token t;
+}
+{
+	t=<MENOR_IGUAL>{jjtThis.setName(t.image);}
+}
+
+void r_mayor_igual()#MAYOR_IGUAL:
+{
+	Token t;
+}
+{
+	t=<MAYOR_IGUAL>{jjtThis.setName(t.image);}
+}
+
+void r_suma()#SUMA:
+{
+	Token t;
+}
+{
+	t=<SUMA>{jjtThis.setName(t.image);}
+}
+
+void r_multi()#MULTI:
+{
+	Token t;
+}
+{
+	t=<MULTI>{jjtThis.setName(t.image);}
+}
+
+void r_div()#DIV:
+{
+	Token t;
+}
+{
+	t=<DIV>{jjtThis.setName(t.image);}
+}
+
+void r_pow()#POW:
+{
+	Token t;
+}
+{
+	t=<POW>{jjtThis.setName(t.image);}
+}
+
+void r_booleano()#BOOLEAN:
+{
+	Token t;
+}
+{
+	t=<BOOLEAN>{jjtThis.setName(t.image);}
+}
+
+void logica_Conusltas():
+{}
+{
+   aritmetica() operador_consulta() aritmetica() (logica_Conusltas2())*
+   |<R_USUARIO> operador_consulta() aritmetica() (logica_Conusltas2())*
+    
+}
+
+void operador_consulta():
+{}
+{
+	r_igual()
+	|r_mayor()
+	|r_menor()
+	|r_mayor_igual()
+	|r_menor_igual()
+	
+}
+
+void operador_consulta2():
+{}
+{
+	r_and()
+	|r_or()
+	|r_distinto()
+	
+}
+
+void logica_Conusltas2():
+{}
+{
+  LOOKAHEAD(2)operador_consulta2() aritmetica() operador_consulta() aritmetica()
+  |LOOKAHEAD(2)operador_consulta2() <R_PAS> operador_consulta() aritmetica()
+}
+
+void r_asc()#ASC:
+{
+	Token t;
+}
+{
+	t=<R_ASC>{jjtThis.setName(t.image);}
+}
+
+
+void r_desc()#DESC:
+{
+	Token t;
+}
+{
+	t=<R_DESC>{jjtThis.setName(t.image);}
+}
+
+void r_umsql()#USQLDUMP:
+{
+	Token t;
+}
+{
+	t=<R_USQLDUMP>{jjtThis.setName(t.image);}
+}
+
+
+void r_completo()#COMPLETO:
+{
+	Token t;
+}
+{
+	t=<R_COMPLETO>{jjtThis.setName(t.image);}
+}
+
+void r_tabla()#TABLA:
+{
+	Token t;
+}
+{
+	t=<R_TABLA>{jjtThis.setName(t.image);}
+}
+
+void r_objeto()#OBJETO:
+{
+	Token t;
+}
+{
+	t=<R_OBJETO>{jjtThis.setName(t.image);}
+}
+
+void r_usario()#USUARIO:
+{
+	Token t;
+}
+{
+	t=<R_USUARIO>{jjtThis.setName(t.image);}
+}
+
+void r_incr()#INCR:
+{
+	Token t;
+}
+{
+	t=<INCR>{jjtThis.setName(t.image);}
+}
+
+void r_decr()#DECR:
+{
+	Token t;
+}
+{
+	t=<DECR>{jjtThis.setName(t.image);}
+}
+
+void r_detener()#DETENER:
+{
+	Token t;
+}
+{
+	t=<R_DETENER>{jjtThis.setName(t.image);}
+}
+
+void r_usuario()#USUARIO:
+{
+	Token t;
+}
+{
+	t=<R_USUARIO>{jjtThis.setName(t.image);}
+}
+
+
+JAVACODE 
+void error_skipto(int kind) { 
+ParseException e = generateParseException(); // se genera el objeto excepción
+System.out.println(e.toString()); // se imprime el mensaje de error
+Token t; 
+do {
+t = getNextToken();
+} while (t.kind != kind);
+}
