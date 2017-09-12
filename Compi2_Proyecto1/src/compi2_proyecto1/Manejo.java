@@ -1815,7 +1815,7 @@ public class Manejo implements Datos.Iface {
                         NodeList items = doc.getElementsByTagName("Objeto");
                         Element element = (Element) items.item(0);
 
-                        NodeList objetos = element.getElementsByTagName("OBJ");
+                        NodeList objetos = element.getElementsByTagName("Obj");
                         for(int x=0;x<objetos.getLength();x++){
                             Element elemento=(Element) objetos.item(x);
                             NodeList datos=elemento.getElementsByTagName("nombre");
@@ -2553,8 +2553,20 @@ public class Manejo implements Datos.Iface {
             break;
             
             case 52://Asignacion declaracion
-                if(raiz.children.length==2){
+                if(raiz.children.length==4){
                     //Ejecutar Funcion
+                    if(Ejecutar){
+                        
+                    }else{
+                        Respuesta=Ejecuccion((SimpleNode) raiz.children[0])+"("+Ejecuccion((SimpleNode) raiz.children[2])+")";
+                    }
+                }else if(raiz.children.length==3){
+                        if(Ejecutar){
+
+                        }else{
+                            Respuesta=Ejecuccion((SimpleNode) raiz.children[0])+"()";                            
+                        }
+                    
                 }else{
                     Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
                 }
@@ -3085,16 +3097,11 @@ public class Manejo implements Datos.Iface {
                     
                     if(Existefuncion(Proc_name,BASE_USO)){
                         String instrucciones=Ejecutar_Proc(Proc_name,BASE_USO);
-                         InputStream is = new ByteArrayInputStream(instrucciones.getBytes());
-                         Analizador a = new Analizador(is, "UTF-8");
-                        try {
-                            SimpleNode subraiz = a.Programa();
-                            Respuesta=Ejecuccion(subraiz);
-                            
+                        SubManejo ejec=new SubManejo();
+                        String aoperar=instrucciones.substring(1, instrucciones.length()-1);
+                        ejec.Manejar(aoperar,BASE_USO);
                             //Respuesta
-                        } catch (ParseException ex) {
-                            System.out.println(ex);
-                        }
+                        
                     }else{
                         Respuesta="No Existe el Procedimiento:"+Proc_name+" en la base:"+BASE_USO;
                     }

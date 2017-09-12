@@ -582,7 +582,7 @@ void asignacion_declaracion():
 {}
 {
 		  
-        aritmetica()(<PAR_IZ>Valor()<PAR_DER>)?
+        aritmetica()(r_parI()(Valor())?r_parD())?
 
 }
 
@@ -1153,6 +1153,22 @@ void r_quitar()#QUITAR:
 }
 {
 	t=<R_QUITAR>{jjtThis.setName(t.image);}
+}
+
+void r_parI()#PAR_IZ:
+{
+	Token t;
+}
+{
+	t=<PAR_IZ>{jjtThis.setName(t.image);}
+}
+
+void r_parD()#PAR_DER:
+{
+	Token t;
+}
+{
+	t=<PAR_DER>{jjtThis.setName(t.image);}
 }
 
 

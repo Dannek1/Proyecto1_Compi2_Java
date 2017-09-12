@@ -120,7 +120,10 @@ public interface SubAnalisisTreeConstants
   public int JJTINCR = 114;
   public int JJTDECR = 115;
   public int JJTDETENER = 116;
-  public int JJTERROR_SKIPTO = 117;
+  public int JJTBASE_DATOS = 117;
+  public int JJTAGREGAR = 118;
+  public int JJTQUITAR = 119;
+  public int JJTERROR_SKIPTO = 120;
 
 
   public String[] jjtNodeName = {
@@ -241,7 +244,10 @@ public interface SubAnalisisTreeConstants
     "INCR",
     "DECR",
     "DETENER",
+    "BASE_DATOS",
+    "AGREGAR",
+    "QUITAR",
     "error_skipto",
   };
 }
-/* JavaCC - OriginalChecksum=191c35fff89ede55617efd8fe9b6a0c2 (do not edit this line) */
+/* JavaCC - OriginalChecksum=0396659b5721bf0963297b88efc2857e (do not edit this line) */

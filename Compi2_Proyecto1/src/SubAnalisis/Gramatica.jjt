@@ -525,15 +525,15 @@ void alterado():
 void accion_alterado_tabla():
 {}
 {
-	 <R_AGREGAR><PAR_IZ>Campos_Tabla()<PAR_DER>
-	|<R_QUITAR>campos()
+	  r_agregar()<PAR_IZ>Campos_Tabla()<PAR_DER>
+	|r_quitar()campos()
 }
 
 void accion_alterado_objeto():
 {}
 {
-	 <R_AGREGAR><PAR_IZ>Parametros()<PAR_DER>
-	|<R_QUITAR>campos()
+	 r_agregar()<PAR_IZ>Parametros()<PAR_DER>
+	|r_quitar()campos()
 }
 
 void Eliminar():
@@ -576,7 +576,7 @@ void asignacion_declaracion():
 {}
 {
 		  
-        aritmetica()(<PAR_IZ>Valor()<PAR_DER>)?
+        aritmetica()(r_parI()(Valor())?r_parD())?
 
 }
 
@@ -1125,6 +1125,46 @@ void r_usuario()#USUARIO:
 	t=<R_USUARIO>{jjtThis.setName(t.image);}
 }
 
+
+void r_base()#BASE_DATOS:
+{
+	Token t;
+}
+{
+	t=<R_BASE>{jjtThis.setName(t.image);}
+}
+
+void r_agregar()#AGREGAR:
+{	
+	Token t;
+}
+{
+	t=<R_AGREGAR>{jjtThis.setName(t.image);}
+}
+
+void r_quitar()#QUITAR:
+{
+	Token t;
+}
+{
+	t=<R_QUITAR>{jjtThis.setName(t.image);}
+}
+
+void r_parI()#PAR_IZ:
+{
+	Token t;
+}
+{
+	t=<PAR_IZ>{jjtThis.setName(t.image);}
+}
+
+void r_parD()#PAR_DER:
+{
+	Token t;
+}
+{
+	t=<PAR_DER>{jjtThis.setName(t.image);}
+}
 
 JAVACODE 
 void error_skipto(int kind) { 

@@ -1995,7 +1995,7 @@ void asignacion_declaracion():
         try {
 /*@egen*/
 		  
-        aritmetica()(<PAR_IZ>Valor()<PAR_DER>)?/*@bgen(jjtree)*/
+        aritmetica()(r_parI()(Valor())?r_parD())?/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -4143,6 +4143,56 @@ void r_quitar()       :
                       jjtree.closeNodeScope(jjtn000, true);
                       jjtc000 = false;
                     }
+/*@egen*/{jjtn000.setName(t.image);}/*@bgen(jjtree)*/
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
+}
+
+void r_parI()       :
+{/*@bgen(jjtree) PAR_IZ */
+        SimpleNode jjtn000 = new SimpleNode(JJTPAR_IZ);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Token t;
+}
+{/*@bgen(jjtree) PAR_IZ */
+        try {
+/*@egen*/
+	t=<PAR_IZ>/*@bgen(jjtree)*/
+                  {
+                    jjtree.closeNodeScope(jjtn000, true);
+                    jjtc000 = false;
+                  }
+/*@egen*/{jjtn000.setName(t.image);}/*@bgen(jjtree)*/
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
+}
+
+void r_parD()        :
+{/*@bgen(jjtree) PAR_DER */
+        SimpleNode jjtn000 = new SimpleNode(JJTPAR_DER);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Token t;
+}
+{/*@bgen(jjtree) PAR_DER */
+        try {
+/*@egen*/
+	t=<PAR_DER>/*@bgen(jjtree)*/
+                   {
+                     jjtree.closeNodeScope(jjtn000, true);
+                     jjtc000 = false;
+                   }
 /*@egen*/{jjtn000.setName(t.image);}/*@bgen(jjtree)*/
         } finally {
           if (jjtc000) {
