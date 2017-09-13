@@ -48,8 +48,10 @@ public class Manejo implements Datos.Iface {
     boolean Ejecutar=true;
     boolean Ejecutar_Swithc=false;
     boolean Detener=false;
+    boolean Backup=false;
     String EXP_SWITCH="";
     String Historial="";
+    String Comandos="";
     
     Anlisis_XML LeerXML=new Anlisis_XML();
     Analisis_Paquete LeerPaquete=new Analisis_Paquete();
@@ -68,6 +70,7 @@ public class Manejo implements Datos.Iface {
                 
         } else if (!instruciones.equals("ERROR")) {
             InputStream is = new ByteArrayInputStream(sentencias[1].getBytes());
+            Comandos=sentencias[1];
             Date f_historial=new Date();
             DateFormat hourdateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss ");
             Historial +=hourdateFormat.format(f_historial)+";"+sentencias[1]+";";
@@ -124,15 +127,29 @@ public class Manejo implements Datos.Iface {
                     Lectura = Ejecuccion(raiz); 
                     if (!Lectura.equals("")) {
                         
-                        try{
-                           String[] leer=Lectura.split("@");
-                           if(leer[0].equals("CREAR")){
-                            Historial+=leer[1]+";n";    
-                            Respuesta ="[\n \"paquete\" : \"usql\",\"mensaje\" : \""+leer[1]+"\" \n]";
-                            }     
-                        }catch(Exception x){
+                        
+                        if (Backup == false) {
+                            try {
+                                String[] leer = Lectura.split("@");
+                                if (leer[0].equals("CREAR")) {
+                                    Historial += leer[1] + ";n";
+                                    Respuesta = "[\n \"paquete\" : \"usql\",\"mensaje\" : \"" + leer[1] + "\" \n]";
+                                    Añadir_Bitacora(Comandos);
+                                }
+                            } catch (Exception x) {
+
+                            }
+                        } else {
+                            String[] Asegurar=Lectura.split("#");
+                            
+                            if(Asegurar.length==3){
+                                
+                            }else{
+                               Respuesta = "[\n \"paquete\" : \"usql\",\"mensaje\" : \"" + Asegurar[0] + "\" \n , \"Archivo\": \"" + Asegurar[1] + "\"]"; 
+                            }
                             
                         }
+                        
                             
                         
                     }else{
@@ -153,6 +170,41 @@ public class Manejo implements Datos.Iface {
         
         
         
+        return Respuesta;
+    }
+    
+    void CrearBitacora(String base) throws IOException{
+        if (Existe("C:\\Base_Compi2\\BD\\" + base + "_BIT.usac") == false){
+            BufferedWriter  bw = new BufferedWriter(new FileWriter("C:\\Base_Compi2\\BD\\" + base + "_BIT.usac"));   
+            
+            bw.write("Bitacora de "+base+";\n");
+            bw.close();
+        }
+    }
+    
+    void Añadir_Bitacora(String Cadena){
+        if (!BASE_USO.equals("")) {
+            BufferedWriter out = null;
+            try {
+                out = new BufferedWriter(new FileWriter("C:\\Base_Compi2\\BD\\" + BASE_USO + "_BIT.usac", true));
+                out.newLine();
+                out.write(Cadena);
+                out.close();
+            } catch (IOException e) {
+                // error processing code  
+            }
+        }
+    }        
+    
+    String LeerBitacora(String Base) throws FileNotFoundException, IOException{
+        String Respuesta = "La Bitacora de la Base "+Base+" Es:\n";
+        String cadena;
+        FileReader f = new FileReader("C:\\Base_Compi2\\BD\\" + Base + "_BIT.usac");
+        BufferedReader b = new BufferedReader(f);
+        while ((cadena = b.readLine()) != null) {
+            Respuesta+=cadena+"\n";
+        }
+        b.close();
         return Respuesta;
     }
     
@@ -309,6 +361,7 @@ public class Manejo implements Datos.Iface {
                 BASE_USO=Nombre;
                 CrearProArch(Nombre+"_PRO");
                 CrearObjetoArch(Nombre+"_OBJ");
+                CrearBitacora(BASE_USO);
                 BASE_USO="";
                 Respuesta="Base de Datos: "+Nombre+" creada";
             } catch (Exception e) {
@@ -1993,6 +2046,50 @@ public class Manejo implements Datos.Iface {
         return respuesta;
     }
     
+    String TablasBase(String Base){
+        String respuesta="";
+          if (Existe("C:\\Base_Compi2\\BD\\" + Base + ".usac")) {
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document doc = builder.parse(new File("C:/Base_Compi2/BD/" + Base + ".usac"));
+
+                NodeList items = doc.getElementsByTagName("Base");
+                Element general=(Element)items.item(0);
+                
+                NodeList tablas=general.getElementsByTagName("Tabla");
+                
+                for(int x=0;x<tablas.getLength();x++){
+                    Element temp = (Element)items.item(x);
+                    
+                    NodeList nombrel=temp.getElementsByTagName("nombre");
+                    Node nombren=nombrel.item(0);
+                    String nombre=nombren.getTextContent();
+                            
+                            
+                    NodeList pathl=temp.getElementsByTagName("path");
+                    Node pathn=pathl.item(0);
+                    String path=pathn.getTextContent();
+                    
+                    
+                    nombre=EliminaCaracteres(nombre);
+                    path=EliminaCaracteres(path);
+                    
+                    respuesta+=nombre+";"+path+"#";
+                }
+
+               
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            respuesta = "No Existe la Base: "+Base;
+        }   
+        
+        return respuesta;
+    }
+       
     public String Ejecuccion(SimpleNode raiz) throws FileNotFoundException{
         String Respuesta="";
         int id=raiz.id;
@@ -2442,9 +2539,23 @@ public class Manejo implements Datos.Iface {
             break;
             
             case 40://back
+                Backup=true;
                 String Tipo_back=Ejecuccion((SimpleNode) raiz.children[0]);
                 String Base_back=((SimpleNode) raiz.children[1]).name;
                 String Archivo_back=((SimpleNode) raiz.children[2]).name;
+                
+                if(Tipo_back.equals("COMPLETO")){
+                    String Tablas=TablasBase(Base_back);
+                    
+                    Respuesta=Base_back+"#"+Tablas+"#"+Archivo_back;
+                }else if(Tipo_back.equals("USQLDUMP")){
+                    try {
+                        Respuesta = LeerBitacora(Base_back)+"#"+Archivo_back;
+                    } catch (IOException ex) {
+                        Logger.getLogger(Manejo.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                
                 
             break;
             

@@ -1597,7 +1597,7 @@ void back():
 {/*@bgen(jjtree) back */
         try {
 /*@egen*/
-	<R_BACKUP>tipo_back()r_id() r_id()r_punto_coma()/*@bgen(jjtree)*/
+	<R_BACKUP>tipo_back()r_id() r_id()(<PUNTO>r_id())?r_punto_coma()/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);

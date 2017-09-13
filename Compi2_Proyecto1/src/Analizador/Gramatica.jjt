@@ -496,7 +496,7 @@ void Denegar():
 void back():
 {}
 {
-	<R_BACKUP>tipo_back()r_id() r_id()r_punto_coma()
+	<R_BACKUP>tipo_back()r_id() r_id()(<PUNTO>r_id())?r_punto_coma()
         
 }
 
