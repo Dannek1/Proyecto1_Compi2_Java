@@ -561,7 +561,8 @@ void objetos_eliminar():
 void Declarar():
 {}
 {
-	<R_DECLARAR> lista_variables() Tipo_Dato()(<I_ASIG> asignacion_declaracion())? r_punto_coma()
+	LOOKAHEAD(3)<R_DECLARAR> lista_variables() Tipo_Dato()(<I_ASIG> asignacion_declaracion())? r_punto_coma()
+	|<R_DECLARAR> r_id() r_id() r_punto_coma()
         
 }
 
@@ -589,7 +590,8 @@ void asignacion_declaracion():
 void Asignacion():
 {}
 {
-	r_id()<I_ASIG>aritmetica()r_punto_coma()
+	LOOKAHEAD(2)r_id() <I_ASIG>aritmetica()r_punto_coma()
+	|r_id() <PUNTO>r_id() <I_ASIG>aritmetica()r_punto_coma()
         
 }
 

@@ -140,10 +140,28 @@ public class Manejo implements Datos.Iface {
 
                             }
                         } else {
-                            String[] Asegurar=Lectura.split("#");
+                            String[] Asegurar=Lectura.split("@");
                             
                             if(Asegurar.length==3){
+                                String back=LeerArchivos(Asegurar[0],Asegurar[1]);
+                                Respuesta="[\n \"paquete\" : \"usql\",\"mensaje\" : \"Backup General\" \n ,";
+                                String[] Archivos=back.split("@");
+                                for(int x=0;x<(Archivos.length);x++){
+                                    String[] Archivo=Archivos[x].split("#");
+                                    
+                                    Respuesta+="\"nombre\": \" "+Archivo[0]+" \" ,\"Archivo\": "+ Archivo[1] ;
+                                 
+                                    if(x<(Archivos.length-1)){
+                                        Respuesta+=",\n";
+                                    }else{
+                                        Respuesta+="\n";
+                                    }
+                                    
+                                }
                                 
+                                Respuesta+=", \"Archivo\": \""+Asegurar[2]+ "\" ]";
+                                
+                                System.out.println("Prueba");
                             }else{
                                Respuesta = "[\n \"paquete\" : \"usql\",\"mensaje\" : \"" + Asegurar[0] + "\" \n , \"Archivo\": \"" + Asegurar[1] + "\"]"; 
                             }
@@ -156,6 +174,48 @@ public class Manejo implements Datos.Iface {
                         Respuesta ="[\n \"paquete\" : \"usql\",]";
                     }
                         
+                }else if(sentencias[0].equals("reporte")) {
+                    Lectura = Ejecuccion(raiz);
+                    
+                    String[] entradas=Lectura.split("o/");
+                    
+                    String[] valores=entradas[1].split("#");
+                    String Empaquetar="<table>\n";
+                    
+                    for(int x=0;x<valores.length;x++){
+                        if(x==0){
+                            String[] valor=valores[x].split(";");
+                            Empaquetar+="<tr>\n";
+                            for(int y=0;y<valor.length;y++){
+                                String[] dato=valor[y].split(",");
+                                Empaquetar+="<th>"+dato[0]+"</th>\n";
+                            }
+                            
+                            Empaquetar+="</tr>\n";
+                            Empaquetar+="<tr>\n";
+                            for(int y=0;y<valor.length;y++){
+                                String[] dato=valor[y].split(",");
+                                Empaquetar+="<th>"+dato[1]+"</th>\n";
+                            }
+                            Empaquetar+="</tr>\n";
+                                
+                        }else{
+                            
+                            String[] valor=valores[x].split(";");
+                            Empaquetar+="<tr>\n";
+                            for(int y=0;y<valor.length;y++){
+                                String[] dato=valor[y].split(",");
+                                Empaquetar+="<th>"+dato[1]+"</th>\n";
+                            }
+                            Empaquetar+="</tr>\n";
+                        }
+                        
+                    }
+                    Empaquetar+="</table>\n";
+                    
+                    Respuesta="[\"paquete\":\"reporte\" \n , \"datos\" : [\n "+Empaquetar+"]\n ]";
+                    System.out.println("reporte");
+                    
                 }
             } catch (ParseException e) {
                 System.out.println(e.getMessage());
@@ -165,13 +225,95 @@ public class Manejo implements Datos.Iface {
                 Respuesta = "ERRO en paquete";
             }
         } else {
-            Respuesta = "ERRO en paquete";
+            Respuesta = "ERROR en paquete";
         }
         
         
         
         return Respuesta;
     }
+    
+    String LeerArchivos(String Base,String paths){
+        String respuesta="";
+        File archivo = null;
+        FileReader fr = null;
+        BufferedReader br = null;
+        //Lectura Base
+        
+        try {
+            archivo = new File ("C:\\Base_Compi2\\BD\\" + Base + ".usac");
+            fr = new FileReader (archivo);
+            br = new BufferedReader(fr);
+            String linea;
+            respuesta+=Base+"#";
+            while((linea=br.readLine())!=null){
+                respuesta+=linea;
+            }
+            
+            respuesta+="@";
+            br.close();
+            
+            String proc=ProcBase(Base);
+            proc=EliminaCaracteres(proc);
+            
+            archivo = new File (proc);
+            fr = new FileReader (archivo);
+            br = new BufferedReader(fr);
+            
+            respuesta+=Base+"_PRO#";
+            
+            while((linea=br.readLine())!=null){
+                respuesta+=linea;
+            }
+            
+            respuesta+="@";
+            br.close();
+            
+            String obj=ObjBase(Base);
+            obj=EliminaCaracteres(obj);
+            
+            archivo = new File (obj);
+            fr = new FileReader (archivo);
+            br = new BufferedReader(fr);
+            
+            respuesta+=Base+"_OBJ#";
+            
+            while((linea=br.readLine())!=null){
+                respuesta+=linea;
+            }
+            
+            respuesta+="@";
+            br.close();
+            
+            String[] ruta=paths.split("#");
+            for(int x=0;x<ruta.length;x++){
+                ruta[x]=EliminaCaracteres(ruta[x]);
+                String[] partes=ruta[x].split(";");
+                respuesta+=partes[0]+"#";
+                
+                archivo = new File (partes[1]);
+                fr = new FileReader (archivo);
+                br = new BufferedReader(fr);
+                while((linea=br.readLine())!=null){
+                respuesta+=linea;
+                }
+                respuesta+="@";
+                br.close();
+            }
+            
+            
+        } catch (FileNotFoundException ex) {
+            respuesta="ERROR";
+        } catch (IOException ex) {
+            respuesta="ERROR";
+        }
+        
+        
+        
+        return respuesta;
+    }
+    
+    
     
     void CrearBitacora(String base) throws IOException{
         if (Existe("C:\\Base_Compi2\\BD\\" + base + "_BIT.usac") == false){
@@ -837,12 +979,6 @@ public class Manejo implements Datos.Iface {
     int Ultimo_incrementable(String Tabla, String Base, String Campo){
         int Respuesta =0;
         
-        
-        return Respuesta;
-    }
-    
-    String Path_tabla(String Tabla,String Base){
-        String Respuesta="";
         
         return Respuesta;
     }
@@ -1563,7 +1699,154 @@ public class Manejo implements Datos.Iface {
         }else{
             if (BASE_USO.equals("")) {
                         System.out.println("No Hay ninguna Base en Uso");
-                    } else {
+                } else {
+                
+                try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document doc = builder.parse(new File("C:/Base_Compi2/BD/"+Tabla+".usac"));
+                
+                NodeList items = doc.getElementsByTagName("Row");
+                String Valores="";
+                if(Campos.equals("*")){
+                   
+                    for(int x=0;x<items.getLength();x++){
+                       Element element = (Element) items.item(x); 
+                       NodeList elementos=element.getChildNodes();
+                       
+                       for(int y=0;y<elementos.getLength();y++){
+                           Element temp=(Element)elementos.item(y);
+                           
+                           Valores+=temp.getTagName()+","+temp.getTextContent()+";";
+                       }
+                       
+                       Valores+="#";
+                    } 
+                    
+                    Valores=Valores.toLowerCase();
+                    
+                    String[] Registros = Valores.split("#");
+
+                    if (!Condiciones.equals("")) {
+                        String[] Condicion = Condiciones.split("&&");
+
+                        String cond = "";
+
+                        for (int x = 0; x < Condicion.length; x++) {
+                            String[] temp = Condicion[x].split("==");
+                            cond += temp[0] + "," + temp[1] + ";";
+                        }
+                        String[] term = cond.split(";");
+
+                        boolean resultado = false;
+
+                        for (int x = 0; x < Registros.length; x++) {
+
+                            int y = 0;
+
+                            while (y < term.length) {
+                                if (Registros[x].contains(term[y])) {
+                                    resultado = true;
+                                    y++;
+                                } else {
+                                    resultado = false;
+                                    break;
+                                }
+                            }
+
+                            if (resultado) {
+                                Respuesta += Registros[x] + "#";
+                            }
+                        }
+                    }else{
+                    Respuesta=Valores;    
+                    }
+                    
+
+                }else{
+                    
+                    String busqueda="";
+                    for(int x=0;x<items.getLength();x++){
+                       Element element = (Element) items.item(x); 
+                       NodeList elementos=element.getChildNodes();
+                       
+                       for(int y=0;y<elementos.getLength();y++){
+                           Element temp=(Element)elementos.item(y);
+                           
+                           Valores+=temp.getTagName()+","+temp.getTextContent()+";";
+                       }
+                       
+                       Valores+="#";
+                    } 
+                    
+                    Valores=Valores.toLowerCase();
+                    
+                    String[] Registros = Valores.split("#");
+
+                    if (!Condiciones.equals("")) {
+                        String[] Condicion = Condiciones.split("&&");
+
+                        String cond = "";
+
+                        for (int x = 0; x < Condicion.length; x++) {
+                            String[] temp = Condicion[x].split("==");
+                            cond += temp[0] + "," + temp[1] + ";";
+                        }
+                        String[] term = cond.split(";");
+
+                        boolean resultado = false;
+
+                        for (int x = 0; x < Registros.length; x++) {
+
+                            int y = 0;
+
+                            while (y < term.length) {
+                                if (Registros[x].contains(term[y])) {
+                                    resultado = true;
+                                    y++;
+                                } else {
+                                    resultado = false;
+                                    break;
+                                }
+                            }
+
+                            if (resultado) {
+                                busqueda += Registros[x] + "#";
+                            }
+                        }
+                    }else{
+                    busqueda=Valores;    
+                    }
+                    
+                    String[] Campo=Campos.split(",");
+                    
+                    String[] filtro=busqueda.split("#");
+                    
+                    for(int x=0;x<filtro.length;x++){
+                        String[] reg=filtro[x].split(";");
+                        
+                        for(int y=0;y<reg.length;y++){
+                            
+                            for(int z=0;z<Campo.length;z++){
+                                if(reg[y].contains(Campo[z])){
+                                    Respuesta+=reg[y]+";";
+                                    
+                                }
+                            }
+                        }
+                        
+                        Respuesta+="#";
+                        
+                    }
+                    
+                    
+                    
+                    
+                }                           
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
                 
             }
         }
@@ -2060,7 +2343,7 @@ public class Manejo implements Datos.Iface {
                 NodeList tablas=general.getElementsByTagName("Tabla");
                 
                 for(int x=0;x<tablas.getLength();x++){
-                    Element temp = (Element)items.item(x);
+                    Element temp = (Element)tablas.item(x);
                     
                     NodeList nombrel=temp.getElementsByTagName("nombre");
                     Node nombren=nombrel.item(0);
@@ -2076,6 +2359,76 @@ public class Manejo implements Datos.Iface {
                     path=EliminaCaracteres(path);
                     
                     respuesta+=nombre+";"+path+"#";
+                }
+
+               
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            respuesta = "No Existe la Base: "+Base;
+        }   
+        
+        return respuesta;
+    }
+    
+    String ProcBase(String Base){
+        String respuesta="";
+          if (Existe("C:\\Base_Compi2\\BD\\" + Base + ".usac")) {
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document doc = builder.parse(new File("C:/Base_Compi2/BD/" + Base + ".usac"));
+
+                NodeList items = doc.getElementsByTagName("Base");
+                Element general=(Element)items.item(0);
+                
+                NodeList tablas=general.getElementsByTagName("Procedure");
+                
+                for(int x=0;x<tablas.getLength();x++){
+                    Element temp = (Element)tablas.item(x);
+       
+                    NodeList pathl=temp.getElementsByTagName("path");
+                    Node pathn=pathl.item(0);
+                    String path=pathn.getTextContent();
+
+                    respuesta=path;
+                }
+
+               
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            respuesta = "No Existe la Base: "+Base;
+        }   
+        
+        return respuesta;
+    }
+    
+     String ObjBase(String Base){
+        String respuesta="";
+          if (Existe("C:\\Base_Compi2\\BD\\" + Base + ".usac")) {
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document doc = builder.parse(new File("C:/Base_Compi2/BD/" + Base + ".usac"));
+
+                NodeList items = doc.getElementsByTagName("Base");
+                Element general=(Element)items.item(0);
+                
+                NodeList tablas=general.getElementsByTagName("Object");
+                
+                for(int x=0;x<tablas.getLength();x++){
+                    Element temp = (Element)tablas.item(x);
+       
+                    NodeList pathl=temp.getElementsByTagName("path");
+                    Node pathn=pathl.item(0);
+                    String path=pathn.getTextContent();
+
+                    respuesta=path;
                 }
 
                
@@ -2108,7 +2461,7 @@ public class Manejo implements Datos.Iface {
                 
                 if(raiz.children.length>1){
                 Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
-                Respuesta+=Ejecuccion((SimpleNode) raiz.children[1]);
+                Respuesta+="o/"+Ejecuccion((SimpleNode) raiz.children[1]);
                 }else{
                  Respuesta=Ejecuccion((SimpleNode) raiz.children[0]);
                 }
@@ -2547,7 +2900,8 @@ public class Manejo implements Datos.Iface {
                 if(Tipo_back.equals("COMPLETO")){
                     String Tablas=TablasBase(Base_back);
                     
-                    Respuesta=Base_back+"#"+Tablas+"#"+Archivo_back;
+                    Respuesta=Base_back+"@"+Tablas+"@"+Archivo_back;
+                    
                 }else if(Tipo_back.equals("USQLDUMP")){
                     try {
                         Respuesta = LeerBitacora(Base_back)+"#"+Archivo_back;
@@ -2631,14 +2985,22 @@ public class Manejo implements Datos.Iface {
             
             case 49://Declarar
                 if (Ejecutar) {
-                    String variables = Ejecuccion((SimpleNode) raiz.children[0]);
-                    String Tipo = ((SimpleNode) raiz.children[1]).name;
-                    if (raiz.children.length == 4) {
-                        String Valor = Ejecuccion((SimpleNode) raiz.children[2]);
-                        Declarar(variables, AMBITO, Valor, Tipo);
-                    } else {
-                        Declarar(variables, AMBITO, "", Tipo);
+                    
+                    try {
+                      String instancia= ((SimpleNode) raiz.children[0]).name;
+                      String obejto= ((SimpleNode) raiz.children[1]).name;  
+
+                    } catch (Exception e) {
+                        String variables = Ejecuccion((SimpleNode) raiz.children[0]);
+                        String Tipo = ((SimpleNode) raiz.children[1]).name;
+                        if (raiz.children.length == 4) {
+                            String Valor = Ejecuccion((SimpleNode) raiz.children[2]);
+                            Declarar(variables, AMBITO, Valor, Tipo);
+                        } else {
+                            Declarar(variables, AMBITO, "", Tipo);
+                        }
                     }
+
                 } else {
                     if (raiz.children.length == 4) {
                         Respuesta="DECLARAR "+Ejecuccion((SimpleNode) raiz.children[0])+" "+((SimpleNode) raiz.children[1]).name +"="+Ejecuccion((SimpleNode) raiz.children[2])+";";
